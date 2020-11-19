@@ -28,12 +28,12 @@ export class DarkHouse_Base extends Scene {
     make_control_panel() {
         // Show live time
         // TODO: put the time information show up some how (make a decision first)
-        // this.live_string(box => {
-        //     box.textContent = "Current Game Duration: " + (this.t) + " seconds."
-        // });
+//         this.live_string(box => {
+//             box.textContent = "Current Game Duration: " + (this.t) + " seconds."
+//         });
 
-        this.new_line();
-        this.new_line();
+//         this.new_line();
+//         this.new_line();
 
         this.control_panel.innerHTML += "DarkHouse Game Controls: ";
 
@@ -69,13 +69,8 @@ export class DarkHouse_Base extends Scene {
 
 export class DarkHouse extends DarkHouse_Base {
 
-    display(context, program_state) {
-        // Call the setup code that we left inside the base class:
-        super.display(context, program_state);
-
-        let model_transform = Mat4.identity();
-
-
+    // Helper method to create room
+    createRoom(context, program_state, model_transform){
         let wall_model_transform_1 = model_transform.times(Mat4.scale(10, 10, 10));
         this.shapes.wall.draw(context, program_state, wall_model_transform_1, this.materials.wall_material);
 
@@ -103,6 +98,16 @@ export class DarkHouse extends DarkHouse_Base {
             .times(Mat4.translation(0,1,1))
             .times(Mat4.rotation(Math.PI / 2, 1, 0, 0))
         this.shapes.wall.draw(context, program_state, ceiling_model_transform_, this.materials.wall_material);
+    }
 
+    // Main display function to create objects in the room
+    display(context, program_state) {
+        // Call the setup code that we left inside the base class
+        super.display(context, program_state);
+
+        let model_transform = Mat4.identity();
+
+        // Create main room object
+        this.createRoom(context, program_state, model_transform);
     }
 }
