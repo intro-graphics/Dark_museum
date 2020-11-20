@@ -2,6 +2,7 @@ import {defs, tiny} from './examples/common.js';
 
 // Import Darkhouse
 import {DarkHouse} from "./darkhouse.js";
+import {Obj_File_Demo} from "./examples/obj-file-demo.js";
 
 // Pull these names into this module's scope for convenience:
 const {
