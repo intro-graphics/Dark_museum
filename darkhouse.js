@@ -13,7 +13,9 @@ export class DarkHouse_Base extends Scene {
             wall: new Square(),
             cube: new Cube(),
             torus: new defs.Torus(3, 15),
-            object1: new defs.Subdivision_Sphere(4)
+            torus2: new defs.Torus(10, 10),
+            object1: new defs.Subdivision_Sphere(4),
+            object2: new defs.Subdivision_Sphere(2)
         };
 
         // TODO: set better wall material
@@ -22,9 +24,12 @@ export class DarkHouse_Base extends Scene {
                 {ambient: .4, diffusivity: .6, color: hex_color("#ffffff")}),
 
             sphere_material: new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
+
             cube_material:  new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#0398FC")}),
-            torus_material: new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#FCBA03")})
+
+            torus_material: new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#FCBA03")}),
         };
+
 
         this.initial_camera_location = Mat4.look_at(vec3(-10, 1, 0), vec3(0, 0, 0), vec3(0, 1, 0)).times(Mat4.rotation(- Math.PI/2, 1, 0, 0));
     }
@@ -87,12 +92,25 @@ export class DarkHouse extends DarkHouse_Base {
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
 
         let sphere_model_transform = model_transform.times(Mat4.translation(5, 5, 1)).times(Mat4.rotation(Math.PI / 2 * t, 1, 0, 0));
+        let sphere2_model_transform = model_transform.times(Mat4.translation(6, -6, 1));
+
+
         let cube_model_transform = model_transform.times(Mat4.translation(0, 0, 1));
+        let cube2_model_transform = model_transform.times(Mat4.translation(12, -10, 1));
+
         let torus_model_transform = model_transform.times(Mat4.translation(-5, -5, 2)).times(Mat4.scale(2.5, 2.5, 2));
-        
+        let torus2_model_transform = model_transform.times(Mat4.translation(12, 12, 1)).times(Mat4.rotation(Math.PI/2, 0, 1, 0 )).times(Mat4.rotation(Math.PI/2 * t, 1, 0, 0));
+
+
         this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.sphere_material);
+        this.shapes.object2.draw(context, program_state, sphere2_model_transform, this.materials.sphere_material.override(color(1, 0, 0, 1)));
+
         this.shapes.cube.draw(context, program_state, cube_model_transform, this.materials.cube_material);
+        this.shapes.cube.draw(context, program_state, cube2_model_transform, this.materials.cube_material.override(color(0,1,0,1)));
+
         this.shapes.torus.draw(context, program_state, torus_model_transform, this.materials.torus_material);
+        this.shapes.torus2.draw(context, program_state, torus2_model_transform, this.materials.torus_material.override(color(0.5, 0, 0.5, 1)));
+
 
     }
 
