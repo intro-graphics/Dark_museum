@@ -15,6 +15,7 @@ export class DarkHouse_Base extends Scene {
             cube: new Cube(),
             torus: new defs.Torus(3, 15),
             object1: new defs.Subdivision_Sphere(4),
+            object2: new defs.Subdivision_Sphere(2),
             cow: new Shape_From_File("assets/spot_triangulated.obj")
         };
 
