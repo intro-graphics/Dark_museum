@@ -2,26 +2,31 @@ import {defs, tiny} from './examples/common.js';
 
 // Pull these names into this module's scope for convenience:
 const {vec3, vec4, color, hex_color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
-const {Triangle, Square, Tetrahedron, Windmill, Cube, Subdivision_Sphere} = defs;
+const {Triangle, Square, Tetrahedron, Torus, Windmill, Cube, Subdivision_Sphere, Cylindrical_Tube} = defs;
 
 export class DarkHouse_Base extends Scene {
 
     // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
     constructor() {
         super();
-
-        this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
-
         this.shapes = {
             wall: new Square(),
+            cube: new Cube(),
+            torus: new defs.Torus(3, 15),
+            object1: new defs.Subdivision_Sphere(4)
         };
 
         // TODO: set better wall material
         this.materials = {
             wall_material: new Material(new defs.Phong_Shader(),
                 {ambient: .4, diffusivity: .6, color: hex_color("#ffffff")}),
+
+            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
+            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#0398FC")}),
+            torus_material: new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#FCBA03")})
         };
 
+        this.initial_camera_location = Mat4.look_at(vec3(-10, 1, 0), vec3(0, 0, 0), vec3(0, 1, 0)).times(Mat4.rotation(- Math.PI/2, 1, 0, 0));
     }
 
     // Setup Game Controls
@@ -50,7 +55,14 @@ export class DarkHouse_Base extends Scene {
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            // Define the global camera and projection matrices, which are stored in program_state.
             program_state.set_camera(this.initial_camera_location);
+        } else{
+            if(this.attached){
+                if(this.attached().equals(this.initial_camera_location)){
+                    program_state.set_camera(this.initial_camera_location);
+            }
+          }
         }
 
         // Setup Perspective Matrix
@@ -71,8 +83,18 @@ export class DarkHouse extends DarkHouse_Base {
 
     // Helper method to create room
     createRoom(context, program_state, model_transform){
-        let wall_model_transform_1 = model_transform.times(Mat4.scale(10, 10, 10));
+        const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
+        const angle = t;
+
+        let wall_model_transform_1 = model_transform.times(Mat4.scale(20, 20, 20));
         this.shapes.wall.draw(context, program_state, wall_model_transform_1, this.materials.wall_material);
+
+        let sphere_model_transform = model_transform.times(Mat4.translation(5, 5, 1)).times(Mat4.rotation(Math.PI / 2 * t, 1, 0, 0));
+        let cube_model_transform = model_transform.times(Mat4.translation(0, 0, 1));
+        let torus_model_transform = model_transform.times(Mat4.translation(-5, -5, 2)).times(Mat4.scale(2.5, 2.5, 2));
+        this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.sphere_material);
+        this.shapes.cube.draw(context, program_state, cube_model_transform, this.materials.cube_material);
+        this.shapes.torus.draw(context, program_state, torus_model_transform, this.materials.torus_material);
 
         let wall_model_transform_2 = wall_model_transform_1
             .times(Mat4.translation(1,0,1))
