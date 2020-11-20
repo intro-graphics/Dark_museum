@@ -81,6 +81,21 @@ export class DarkHouse_Base extends Scene {
 
 export class DarkHouse extends DarkHouse_Base {
 
+    // Create Objects 
+    createObjectsInRoom(context, program_state, model_transform) {
+
+        const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
+
+        let sphere_model_transform = model_transform.times(Mat4.translation(5, 5, 1)).times(Mat4.rotation(Math.PI / 2 * t, 1, 0, 0));
+        let cube_model_transform = model_transform.times(Mat4.translation(0, 0, 1));
+        let torus_model_transform = model_transform.times(Mat4.translation(-5, -5, 2)).times(Mat4.scale(2.5, 2.5, 2));
+        
+        this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.sphere_material);
+        this.shapes.cube.draw(context, program_state, cube_model_transform, this.materials.cube_material);
+        this.shapes.torus.draw(context, program_state, torus_model_transform, this.materials.torus_material);
+
+    }
+
     // Helper method to create room
     createRoom(context, program_state, model_transform){
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
@@ -88,13 +103,6 @@ export class DarkHouse extends DarkHouse_Base {
 
         let wall_model_transform_1 = model_transform.times(Mat4.scale(20, 20, 20));
         this.shapes.wall.draw(context, program_state, wall_model_transform_1, this.materials.wall_material);
-
-        let sphere_model_transform = model_transform.times(Mat4.translation(5, 5, 1)).times(Mat4.rotation(Math.PI / 2 * t, 1, 0, 0));
-        let cube_model_transform = model_transform.times(Mat4.translation(0, 0, 1));
-        let torus_model_transform = model_transform.times(Mat4.translation(-5, -5, 2)).times(Mat4.scale(2.5, 2.5, 2));
-        this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.sphere_material);
-        this.shapes.cube.draw(context, program_state, cube_model_transform, this.materials.cube_material);
-        this.shapes.torus.draw(context, program_state, torus_model_transform, this.materials.torus_material);
 
         let wall_model_transform_2 = wall_model_transform_1
             .times(Mat4.translation(1,0,1))
@@ -131,5 +139,8 @@ export class DarkHouse extends DarkHouse_Base {
 
         // Create main room object
         this.createRoom(context, program_state, model_transform);
+
+        // Create objects in the room
+        this.createObjectsInRoom(context, program_state, model_transform);
     }
 }
