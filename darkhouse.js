@@ -22,12 +22,14 @@ export class DarkHouse_Base extends Scene {
         // TODO: set better wall material
         this.materials = {
             wall_material: new Material(new defs.Phong_Shader(),
-                {ambient: .4, diffusivity: .6, color: hex_color("#ffffff")}),
+                {ambient: 0.3, diffusivity: 0.3, color: hex_color("#ffffff")}),
+            floor_material: new Material(new defs.Phong_Shader(),
+                {ambient: 0.3, diffusivity: 0.3, color: hex_color("#8a5454")}),
 
-            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
+            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 0.3, diffusivity: 0.3, specularity: 0.5, color: hex_color("#252F2F")}),
 
-            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#0398FC")}),
-            torus_material: new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#FCBA03")}),
+            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 0.3, diffusivity: 0.3, specularity: 0.5, color: hex_color("#0398FC")}),
+            torus_material: new Material(new defs.Phong_Shader(), {ambient: 0.3, diffusivity: 0.3, specularity: 0.5, color: hex_color("#FCBA03")}),
             cow_material: new Material(new defs.Fake_Bump_Map(1), {
                 color: color(.5, .5, .5, 1),
                 ambient: 0.5, diffusivity: 1, specularity: 1, texture: new Texture("assets/spot_texture.png")
@@ -58,6 +60,11 @@ export class DarkHouse_Base extends Scene {
         this.key_triggered_button("Return To Start", ["Control", "c"], () => this.attached = () => this.initial_camera_location);
     }
 
+    attach_light_to_camera(program_state) {
+            const light_position = vec4.apply(null, program_state.camera_transform.transposed()[3]);
+            program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1)];
+    }
+
     // Called once per frame of animation
     display(context, program_state) {
 
@@ -81,9 +88,9 @@ export class DarkHouse_Base extends Scene {
         // Keep track of program time
         const t = this.t = program_state.animation_time / 1000;
 
+
         // *** Lights: *** Values of vector or point lights.
-        const light_position = vec4(0, 5, 5, 1);
-        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
+        this.attach_light_to_camera(program_state);
     }
 }
 
@@ -120,7 +127,7 @@ export class DarkHouse extends DarkHouse_Base {
         const angle = t;
 
         let wall_model_transform_1 = model_transform.times(Mat4.scale(20, 20, 20));
-        this.shapes.wall.draw(context, program_state, wall_model_transform_1, this.materials.wall_material);
+        this.shapes.wall.draw(context, program_state, wall_model_transform_1, this.materials.floor_material);
 
         let wall_model_transform_2 = wall_model_transform_1
             .times(Mat4.translation(1,0,1))
