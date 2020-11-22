@@ -175,7 +175,6 @@ export class DarkHouse extends DarkHouse_Base {
         if (defs.canvas_mouse_pos) {
             mouse_x = defs.canvas_mouse_pos.dot(vec(1,0));
             mouse_y = defs.canvas_mouse_pos.dot(vec(0,1));
-            console.log(mouse_x, mouse_y);
         }
     }
 }
