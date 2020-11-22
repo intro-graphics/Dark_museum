@@ -36,8 +36,8 @@ export class DarkHouse_Base extends Scene {
             })
         };
 
-
-        this.initial_camera_location = Mat4.look_at(vec3(-10, 1, 0), vec3(0, 0, 0), vec3(0, 1, 0)).times(Mat4.rotation(- Math.PI/2, 1, 0, 0));
+        // Level height for the camera
+        this.initial_camera_location = Mat4.look_at(vec3(-10, 3, 0), vec3(0, 3, 0), vec3(0, 1, 0)).times(Mat4.rotation(- Math.PI/2, 1, 0, 0));
     }
 
     // Setup Game Controls
@@ -175,6 +175,10 @@ export class DarkHouse extends DarkHouse_Base {
         if (defs.canvas_mouse_pos) {
             mouse_x = defs.canvas_mouse_pos.dot(vec(1,0));
             mouse_y = defs.canvas_mouse_pos.dot(vec(0,1));
+        }
+
+        if (defs.pos) {
+            console.log(defs.pos);
         }
     }
 }
