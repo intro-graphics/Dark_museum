@@ -821,6 +821,9 @@ const Movement_Controls = defs.Movement_Controls =
             };
             Object.assign(this, data_members);
 
+            // Define bounds of the room
+            this.bounds = 16;
+
             this.mouse_enabled_canvases = new Set();
             this.will_take_over_graphics_state = true;
         }
@@ -880,11 +883,31 @@ const Movement_Controls = defs.Movement_Controls =
             this.new_line();
 
             this.key_triggered_button("Up", [" "], () => this.thrust[1] = -1, undefined, () => this.thrust[1] = 0);
-            this.key_triggered_button("Forward", ["w"], () => this.thrust[2] = 1, undefined, () => this.thrust[2] = 0);
+            this.key_triggered_button("Forward", ["w"], () => {
+                if (this.pos[2] < this.bounds)
+                    this.thrust[2] = 1;
+                else
+                    this.thrust[2] = 0;
+            }, undefined, () => this.thrust[2] = 0);
             this.new_line();
-            this.key_triggered_button("Left", ["a"], () => this.thrust[0] = 1, undefined, () => this.thrust[0] = 0);
-            this.key_triggered_button("Back", ["s"], () => this.thrust[2] = -1, undefined, () => this.thrust[2] = 0);
-            this.key_triggered_button("Right", ["d"], () => this.thrust[0] = -1, undefined, () => this.thrust[0] = 0);
+            this.key_triggered_button("Left", ["a"], () => {
+                if (this.pos[0] < this.bounds)
+                    this.thrust[0] = 1;
+                else
+                    this.thrust[0] = 0;
+            }, undefined, () => this.thrust[0] = 0);
+            this.key_triggered_button("Back", ["s"], () => {
+                if (this.pos[2] > -this.bounds)
+                    this.thrust[2] = -1;
+                else
+                    this.thrust[2] = 0;
+            }, undefined, () => this.thrust[2] = 0);
+            this.key_triggered_button("Right", ["d"], () => {
+                if (this.pos[0] > -this.bounds)
+                    this.thrust[0] = -1;
+                else
+                    this.thrust[0] = 0;
+            }, undefined, () => this.thrust[0] = 0);
             this.new_line();
             this.key_triggered_button("Down", ["z"], () => this.thrust[1] = 1, undefined, () => this.thrust[1] = 0);
 
@@ -1018,6 +1041,7 @@ const Movement_Controls = defs.Movement_Controls =
             this.z_axis = this.inverse().times(vec4(0, 0, 1, 0));
 
             defs.canvas_mouse_pos = this.mouse.from_center;
+            defs.pos = this.pos;
         }
     }
 
