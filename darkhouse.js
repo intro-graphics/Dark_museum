@@ -1,7 +1,7 @@
 import {defs, tiny} from './examples/common.js';
 import {Shape_From_File} from './examples/obj-file-demo.js';
 // Pull these names into this module's scope for convenience:
-const {vec3, vec4, color, hex_color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
+const {vec, vec3, vec4, color, hex_color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
 const {Triangle, Square, Tetrahedron, Torus, Windmill, Cube, Subdivision_Sphere, Cylindrical_Tube} = defs;
 
 
@@ -84,6 +84,17 @@ export class DarkHouse_Base extends Scene {
         // *** Lights: *** Values of vector or point lights.
         const light_position = vec4(0, 5, 5, 1);
         program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
+
+        // Get mouse position
+        let mouse_x = 0;
+        let mouse_y = 0;
+
+        if (defs.canvas_mouse_pos) {
+            mouse_x = defs.canvas_mouse_pos.dot(vec(1,0));
+            mouse_y = defs.canvas_mouse_pos.dot(vec(0,1));
+            console.log(mouse_x, mouse_y);
+        }
+        
     }
 }
 
