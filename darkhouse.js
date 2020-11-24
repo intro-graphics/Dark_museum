@@ -1,8 +1,8 @@
 import {defs, tiny} from './examples/common.js';
 import {Shape_From_File} from './examples/obj-file-demo.js';
 // Pull these names into this module's scope for convenience:
-const {vec, vec3, vec4, color, hex_color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
-const {Triangle, Square, Tetrahedron, Torus, Windmill, Cube, Subdivision_Sphere, Cylindrical_Tube} = defs;
+const {vec3, vec4, color, hex_color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
+const {Triangle, Square, Tetrahedron, Torus, Windmill, Cube, Subdivision_Sphere, Cylindrical_Tube, Textured_Phong} = defs;
 
 
 export class DarkHouse_Base extends Scene {
@@ -22,14 +22,47 @@ export class DarkHouse_Base extends Scene {
         // TODO: set better wall material
         this.materials = {
             wall_material: new Material(new defs.Phong_Shader(),
-                {ambient: 0.3, diffusivity: 0.3, color: hex_color("#ffffff")}),
-            floor_material: new Material(new defs.Phong_Shader(),
-                {ambient: 0.3, diffusivity: 0.3, color: hex_color("#8a5454")}),
+                { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
+            
+            texture_wall: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .5, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/brick-wall.jpg")
+            }),
 
-            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 0.3, diffusivity: 0.3, specularity: 0.5, color: hex_color("#252F2F")}),
+            texture_box: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .5, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/rubiks-cube.png")
+            }),
 
-            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 0.3, diffusivity: 0.3, specularity: 0.5, color: hex_color("#0398FC")}),
-            torus_material: new Material(new defs.Phong_Shader(), {ambient: 0.3, diffusivity: 0.3, specularity: 0.5, color: hex_color("#FCBA03")}),
+            texture_sphere: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/earth.gif")
+            }),
+
+            texture_minecraft: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/minecraft.jpg")
+            }),
+
+            texture_woodbox: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/woodbox.jpg")
+            }),
+
+            texture_UFO: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/UFO.jpg")
+            }),
+
+            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
+            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#0398FC")}),
+            torus_material: new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#FCBA03")}),
             cow_material: new Material(new defs.Fake_Bump_Map(1), {
                 color: color(.5, .5, .5, 1),
                 ambient: 0.5, diffusivity: 1, specularity: 1, texture: new Texture("assets/spot_texture.png")
@@ -102,7 +135,7 @@ export class DarkHouse extends DarkHouse_Base {
 
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
 
-        let sphere_model_transform = model_transform.times(Mat4.translation(5, 5, 1)).times(Mat4.rotation(Math.PI / 2 * t, 1, 0, 0));
+        let sphere_model_transform = model_transform.times(Mat4.translation(5, 5, 1)).times(Mat4.rotation(Math.PI/2, 1, 0, 0)).times(Mat4.rotation(Math.PI/2*t, 0, 1, 0));
         let sphere2_model_transform = model_transform.times(Mat4.translation(6, -6, 1));
 
         let cube_model_transform = model_transform.times(Mat4.translation(0, 0, 1));
@@ -111,13 +144,13 @@ export class DarkHouse extends DarkHouse_Base {
         let torus_model_transform = model_transform.times(Mat4.translation(-5, -5, 2)).times(Mat4.scale(2.5, 2.5, 2));
         let cow_model_transform = model_transform.times(Mat4.translation(3, 3, 2)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
 
-        this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.sphere_material);
-        this.shapes.object2.draw(context, program_state, sphere2_model_transform, this.materials.sphere_material.override(color(1, 0, 0, 1)));
+        this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.texture_sphere);
+        this.shapes.object2.draw(context, program_state, sphere2_model_transform, this.materials.texture_minecraft);
 
-        this.shapes.cube.draw(context, program_state, cube_model_transform, this.materials.cube_material);
-        this.shapes.cube.draw(context, program_state, cube2_model_transform, this.materials.cube_material.override(color(0,1,0,1)));
+        this.shapes.cube.draw(context, program_state, cube_model_transform, this.materials.texture_box);
+        this.shapes.cube.draw(context, program_state, cube2_model_transform, this.materials.texture_woodbox);
 
-        this.shapes.torus.draw(context, program_state, torus_model_transform, this.materials.torus_material);
+        this.shapes.torus.draw(context, program_state, torus_model_transform, this.materials.texture_UFO);
         this.shapes.cow.draw(context, program_state, cow_model_transform, this.materials.cow_material);
     }
 
@@ -127,32 +160,32 @@ export class DarkHouse extends DarkHouse_Base {
         const angle = t;
 
         let wall_model_transform_1 = model_transform.times(Mat4.scale(20, 20, 20));
-        this.shapes.wall.draw(context, program_state, wall_model_transform_1, this.materials.floor_material);
+        this.shapes.wall.draw(context, program_state, wall_model_transform_1, this.materials.texture_wall);
 
         let wall_model_transform_2 = wall_model_transform_1
             .times(Mat4.translation(1,0,1))
             .times(Mat4.rotation(Math.PI / 2, 0 , 1, 0));
-        this.shapes.wall.draw(context, program_state, wall_model_transform_2, this.materials.wall_material);
+        this.shapes.wall.draw(context, program_state, wall_model_transform_2, this.materials.texture_wall);
 
         let wall_model_transform_3 = wall_model_transform_2
             .times(Mat4.translation(-1,0,-1))
             .times(Mat4.rotation(Math.PI / 2, 0 , 1, 0));
-        this.shapes.wall.draw(context, program_state, wall_model_transform_3, this.materials.wall_material);
+        this.shapes.wall.draw(context, program_state, wall_model_transform_3, this.materials.texture_wall);
 
         let wall_model_transform_4 = wall_model_transform_3
             .times(Mat4.translation(1,0,1))
             .times(Mat4.rotation(Math.PI / 2, 0 , 1, 0));
-        this.shapes.wall.draw(context, program_state, wall_model_transform_4, this.materials.wall_material);
+        this.shapes.wall.draw(context, program_state, wall_model_transform_4, this.materials.texture_wall);
 
         let floor_model_transform = wall_model_transform_1
             .times(Mat4.translation(0,-1,1))
             .times(Mat4.rotation(Math.PI / 2, 1, 0, 0))
-        this.shapes.wall.draw(context, program_state, floor_model_transform, this.materials.wall_material);
+        this.shapes.wall.draw(context, program_state, floor_model_transform, this.materials.texture_wall);
 
         let ceiling_model_transform_ = wall_model_transform_1
             .times(Mat4.translation(0,1,1))
             .times(Mat4.rotation(Math.PI / 2, 1, 0, 0))
-        this.shapes.wall.draw(context, program_state, ceiling_model_transform_, this.materials.wall_material);
+        this.shapes.wall.draw(context, program_state, ceiling_model_transform_, this.materials.texture_wall);
     }
 
     // Main display function to create objects in the room
@@ -173,8 +206,8 @@ export class DarkHouse extends DarkHouse_Base {
         let mouse_y = 0;
 
         if (defs.canvas_mouse_pos) {
-            mouse_x = defs.canvas_mouse_pos.dot(vec(1,0));
-            mouse_y = defs.canvas_mouse_pos.dot(vec(0,1));
+            mouse_x = defs.canvas_mouse_pos[0];
+            mouse_y = defs.canvas_mouse_pos[1];
         }
 
         if (defs.pos) {
