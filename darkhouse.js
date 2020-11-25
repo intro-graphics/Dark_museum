@@ -142,11 +142,6 @@ export class DarkHouse_Base extends Scene {
         this.key_triggered_button("Return To Initial Position", ["Control", "o"], () => this.attached = () => this.initial_camera_location);
     }
 
-    attach_light_to_camera(program_state) {
-            const light_position = vec4.apply(null, program_state.camera_transform.transposed()[3]);
-            program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1)];
-    }
-
     // Called once per frame of animation
     display(context, program_state) {
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
@@ -173,6 +168,12 @@ export class DarkHouse_Base extends Scene {
 
 
 export class DarkHouse extends DarkHouse_Base {
+    // Ensure that light position is equal to camera position
+    attach_light_to_camera(program_state) {
+        const light_position = vec4.apply(null, program_state.camera_transform.transposed()[3]);
+        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1)];
+    }
+    
     // Create Objects 
     createObjectsInRoom(context, program_state, model_transform) {
         const t = program_state.animation_time / 1000;
@@ -228,7 +229,7 @@ export class DarkHouse extends DarkHouse_Base {
     }
 
     // Base setup for splash screens (start, pause, end game, win game)
-    baseSetup(context, program_state, model_transform) {
+    baseScreenSetup(context, program_state, model_transform) {
         // Set lights
         program_state.lights = [new Light(vec4(0, 1, 1, 0), color(1, 1, 1, 1), 1000000)];
         // Set initial camera location
@@ -241,7 +242,7 @@ export class DarkHouse extends DarkHouse_Base {
 
     // Initial game start screen
     startGameSetup(context, program_state, model_transform) {
-        this.baseSetup(context, program_state, model_transform);
+        this.baseScreenSetup(context, program_state, model_transform);
 
         // Define text to be written
         let strings = ['Press Ctrl+S to Start'];
@@ -257,7 +258,7 @@ export class DarkHouse extends DarkHouse_Base {
 
     // Pause game screen
     pauseGameSetup(context, program_state, model_transform) {
-        this.baseSetup(context, program_state, model_transform);
+        this.baseScreenSetup(context, program_state, model_transform);
 
         // Define text to be written
         let strings = ['\t\t\t\t\tGame Paused.\n\n\nPress Ctrl+P to Resume.'];
@@ -274,23 +275,24 @@ export class DarkHouse extends DarkHouse_Base {
 
     // Game Lost Screen
     gameLostScreen(context, program_state, model_transform) {
-        this.baseSetup(context, program_state, model_transform);
+        this.baseScreenSetup(context, program_state, model_transform);
 
         // Define text to be written
-        let strings = ['Game Over. You Lost.'];
+        let strings = ['\t\t\t\tGame Over. You Lost.\n\n\nPress Control+R To Restart.'];
         const multi_line_string = strings[0].split("\n");
         let cube_side = Mat4.rotation(0, 1, 0, 0)
                             .times(Mat4.rotation(0, 0, 1, 0))
-                            .times(Mat4.translation(-1.5, 0, 0.9));
+                            .times(Mat4.translation(-1.9, 0, 0.9));
         for (let line of multi_line_string.slice(0, 30)) {
             this.shapes.text.set_string(line, context.context);
             this.shapes.text.draw(context, program_state, cube_side.times(Mat4.scale(.1, .1, .1)), this.materials.text_image);
+            cube_side.post_multiply(Mat4.translation(0, -0.09, 0));
         }
     }
 
     // Game Won Screen
     gameWonScreen(context, program_state, model_transform) {
-        this.baseSetup(context, program_state, model_transform);
+        this.baseScreenSetup(context, program_state, model_transform);
 
         // Define text to be written
         let strings = ['\t\t\t\tYou Won!\n\n\nYou took ' + this.currentGameTime.toFixed(2) + 's.'];
@@ -325,7 +327,7 @@ export class DarkHouse extends DarkHouse_Base {
     // Set game counter to 60 seconds
     updateGameTime(program_state) {
         // Initially, set timer to 60s
-        if (!this.timeUpdated){
+        if (!this.timeUpdated) {
             this.currentGameTime = 60;
             this.timeUpdated = true;
         } 
@@ -334,6 +336,10 @@ export class DarkHouse extends DarkHouse_Base {
             this.currentGameTime = this.currentGameTime - (program_state.animation_delta_time/1000);
         }
         console.log(this.currentGameTime);
+    }
+
+    showTime(context, program_state, model_transform) {
+        const position = vec4.apply(null, program_state.camera_transform.transposed()[3]);
     }
 
     // Main display function to create objects in the room
