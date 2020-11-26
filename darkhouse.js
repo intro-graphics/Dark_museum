@@ -117,6 +117,22 @@ export class DarkHouse_Base extends Scene {
         this.initial_camera_location = Mat4.look_at(vec3(-10, 3, 0), vec3(0, 3, 0), vec3(0, 1, 0)).times(Mat4.rotation(- Math.PI/2, 1, 0, 0));
     }
 
+    // Function to reset all game controls to initialized state
+    reset() {
+        this.startGame = false;
+        this.pauseGame = false;
+        this.endGame = false;
+        this.allObjectsFound = false;
+        this.timeUpdated = false;
+        this.currentGameTime = 60;
+        this.victory = false;
+        // Pause since game is over
+        this.background_music.pause();
+        // Reinstantiate background music audio file to it can start from the beginning
+        this.background_music = new Audio('background_song.mp3');
+        this.musicStarted = false;
+    }
+
     // Setup Game Controls
     make_control_panel() {
         this.control_panel.innerHTML += "DarkHouse Main Game Controls: ";
@@ -149,19 +165,7 @@ export class DarkHouse_Base extends Scene {
 
         // Restart Game
         this.key_triggered_button("Restart Game", ["Control", "r"], () => {
-            // Only toggle once game has started and game has not ended
-            this.startGame = false;
-            this.pauseGame = false;
-            this.endGame = false;
-            this.allObjectsFound = false;
-            this.timeUpdated = false;
-            this.currentGameTime = 60;
-            this.victory = false;
-            // Pause since game is over
-            this.background_music.pause();
-            // Reinstantiate background music audio file to it can start from the beginning
-            this.background_music = new Audio('background_song.mp3');
-            this.musicStarted = false;
+            this.reset();
         });
         this.new_line(); this.new_line();
 
