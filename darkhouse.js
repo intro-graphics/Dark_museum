@@ -9,9 +9,12 @@ import {Text_Line} from './text-line.js';
 
 export class DarkHouse_Base extends Scene {
 
-    // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
+    // constructor(): Add shapes and materials
     constructor() {
         super();
+
+        // Load background music
+        this.background_music = new Audio('background_song.mp3');
 
         this.startGame = false;
         this.pauseGame = false;
@@ -20,10 +23,15 @@ export class DarkHouse_Base extends Scene {
 
         // For keep tracking of current time in game
         this.timeUpdated = false;
+        this.gameDuration = 60;
         this.currentGameTime = 60;
+
 
         // For tracking victory
         this.victory = false;
+
+        // Tracking music state
+        this.musicStarted = false;
 
         // Models
         this.shapes = {
@@ -107,12 +115,17 @@ export class DarkHouse_Base extends Scene {
 
     // Setup Game Controls
     make_control_panel() {
-        this.control_panel.innerHTML += "DarkHouse Game Controls: ";
+        this.control_panel.innerHTML += "DarkHouse Main Game Controls: ";
         this.new_line(); this.new_line();
 
         // Start Game
         this.key_triggered_button("Start Game", ["Control", "s"], () => {
             this.startGame = true;
+            // Only play if the song has never been played before
+            if (!this.musicStarted) {
+                this.background_music.play();
+                this.musicStarted = true;
+            }
         });
         this.new_line(); this.new_line();
 
@@ -121,6 +134,11 @@ export class DarkHouse_Base extends Scene {
             // Only toggle once game has started and game has not ended
             if (this.startGame && !this.endGame) {
                 this.pauseGame = !this.pauseGame;
+                if (!this.background_music.paused){
+                    this.background_music.pause();
+                } else {
+                    this.background_music.play();
+                }
             }
         });
         this.new_line(); this.new_line();
@@ -135,6 +153,11 @@ export class DarkHouse_Base extends Scene {
             this.timeUpdated = false;
             this.currentGameTime = 60;
             this.victory = false;
+            // Pause since game is over
+            this.background_music.pause();
+            // Reinstantiate background music audio file to it can start from the beginning
+            this.background_music = new Audio('background_song.mp3');
+            this.musicStarted = false;
         });
         this.new_line(); this.new_line();
 
@@ -240,20 +263,29 @@ export class DarkHouse extends DarkHouse_Base {
         this.shapes.cube.draw(context, program_state, start_message_transform, this.materials.start_background);
     }
 
+    // Base functionality for drawing text on surface of splash screens
+    baseDrawText(context, program_state, multi_line_string, cube_side) {
+        for (let line of multi_line_string.slice(0, 30)) {
+            // Set the string using set_string 
+            this.shapes.text.set_string(line, context.context);
+            // Draw but scale down to fit box size
+            this.shapes.text.draw(context, program_state, cube_side.times(Mat4.scale(.1, .1, .1)), this.materials.text_image);
+            // Use post multiply to move down to the next line
+            cube_side.post_multiply(Mat4.translation(0, -0.09, 0));
+        }
+    }
+
     // Initial game start screen
     startGameSetup(context, program_state, model_transform) {
         this.baseScreenSetup(context, program_state, model_transform);
-
         // Define text to be written
-        let strings = ['Press Ctrl+S to Start'];
+        let strings = ['Welcome to the Dark House.\n\n\n\t\tPress Ctrl+S to Start.'];
         const multi_line_string = strings[0].split("\n");
-        for (let line of multi_line_string.slice(0, 30)) {
-            let cube_side = Mat4.rotation(0, 1, 0, 0)
-                                .times(Mat4.rotation(0, 0, 1, 0))
-                                .times(Mat4.translation(-1.5, 0, 0.9));
-            this.shapes.text.set_string(line, context.context);
-            this.shapes.text.draw(context, program_state, cube_side.times(Mat4.scale(.1, .1, .1)), this.materials.text_image);
-        }
+        let cube_side = Mat4.rotation(0, 1, 0, 0)
+                            .times(Mat4.rotation(0, 0, 1, 0))
+                            .times(Mat4.translation(-1.8, 0, 0.9));
+        // Draw text
+        this.baseDrawText(context, program_state, multi_line_string, cube_side);
     }
 
     // Pause game screen
@@ -266,11 +298,8 @@ export class DarkHouse extends DarkHouse_Base {
         let cube_side = Mat4.rotation(0, 1, 0, 0)
                             .times(Mat4.rotation(0, 0, 1, 0))
                             .times(Mat4.translation(-1.5, 0, 0.9));
-        for (let line of multi_line_string.slice(0, 30)) {
-            this.shapes.text.set_string(line, context.context);
-            this.shapes.text.draw(context, program_state, cube_side.times(Mat4.scale(.1, .1, .1)), this.materials.text_image);
-            cube_side.post_multiply(Mat4.translation(0, -0.09, 0));
-        }
+        // Draw text
+        this.baseDrawText(context, program_state, multi_line_string, cube_side);
     }
 
     // Game Lost Screen
@@ -283,11 +312,8 @@ export class DarkHouse extends DarkHouse_Base {
         let cube_side = Mat4.rotation(0, 1, 0, 0)
                             .times(Mat4.rotation(0, 0, 1, 0))
                             .times(Mat4.translation(-1.9, 0, 0.9));
-        for (let line of multi_line_string.slice(0, 30)) {
-            this.shapes.text.set_string(line, context.context);
-            this.shapes.text.draw(context, program_state, cube_side.times(Mat4.scale(.1, .1, .1)), this.materials.text_image);
-            cube_side.post_multiply(Mat4.translation(0, -0.09, 0));
-        }
+        // Draw text
+        this.baseDrawText(context, program_state, multi_line_string, cube_side);
     }
 
     // Game Won Screen
@@ -300,11 +326,8 @@ export class DarkHouse extends DarkHouse_Base {
         let cube_side = Mat4.rotation(0, 1, 0, 0)
                             .times(Mat4.rotation(0, 0, 1, 0))
                             .times(Mat4.translation(-1, 0, 0.9));
-        for (let line of multi_line_string.slice(0, 30)) {
-            this.shapes.text.set_string(line, context.context);
-            this.shapes.text.draw(context, program_state, cube_side.times(Mat4.scale(.1, .1, .1)), this.materials.text_image);
-            cube_side.post_multiply(Mat4.translation(0, -0.09, 0));
-        }
+        // Draw text
+        this.baseDrawText(context, program_state, multi_line_string, cube_side);
     }
 
     // Check game status : Determines if player has won or lost
@@ -314,7 +337,7 @@ export class DarkHouse extends DarkHouse_Base {
             this.victory = true;
         }
         // All objects found but time has run out
-        else if (this.allObjectsFound && (this.currentGameTime <= 0)) {
+        else if ((this.allObjectsFound) && (this.currentGameTime <= 0)) {
             this.victory = false;
         }
         // If time has run out
@@ -328,7 +351,7 @@ export class DarkHouse extends DarkHouse_Base {
     updateGameTime(program_state) {
         // Initially, set timer to 60s
         if (!this.timeUpdated) {
-            this.currentGameTime = 60;
+            this.currentGameTime = this.gameDuration;
             this.timeUpdated = true;
         } 
         // Once timer is set, decrement the relative change in time per frame from initial time
@@ -377,6 +400,9 @@ export class DarkHouse extends DarkHouse_Base {
                 }
                 // Game over 
                 else {
+                    if (!this.background_music.paused) {
+                        this.background_music.pause();
+                    }
                     // Check for victory and display victory screen
                     if (this.victory) {
                         this.gameWonScreen(context, program_state, model_transform);
