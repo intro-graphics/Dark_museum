@@ -26,7 +26,6 @@ export class DarkHouse_Base extends Scene {
         this.gameDuration = 60;
         this.currentGameTime = 60;
 
-
         // For tracking victory
         this.victory = false;
 
@@ -99,6 +98,11 @@ export class DarkHouse_Base extends Scene {
             start_background: new Material(new Phong_Shader(), {
                 color: color(0.5, 0.5, 0.5, 1), ambient: 0,
                 diffusivity: 0, specularity: 0, smoothness: 20
+            }),
+
+            time_background: new Material(new Phong_Shader(), {
+                color: color(161, 31, 31, 1), ambient: 0,
+                diffusivity: 0.5, specularity: 0.3, smoothness: 50
             }),
 
             // To show text you need a Material like this one:
@@ -358,11 +362,26 @@ export class DarkHouse extends DarkHouse_Base {
         else {
             this.currentGameTime = this.currentGameTime - (program_state.animation_delta_time/1000);
         }
-        console.log(this.currentGameTime);
     }
 
-    showTime(context, program_state, model_transform) {
-        const position = vec4.apply(null, program_state.camera_transform.transposed()[3]);
+    // Display time remaining on top
+    showLiveTimeRemaining(context, program_state, model_transform) {
+        // TODO: Need to move timestamp along with camera so it looks like it is in one place
+        
+        // Display current time remaining
+        let strings = ['' + this.currentGameTime.toFixed(2) + 's'];
+        const multi_line_string = strings[0].split("\n");
+        let cube_side = model_transform.times(Mat4.translation(-3, 0.5, 5.5))
+                                       .times(Mat4.rotation(Math.PI/2, 0, 0, -1))
+                                       .times(Mat4.rotation(Math.PI/2, 1, 0, 0));
+
+        // Draw text
+        for (let line of multi_line_string.slice(0, 30)) {
+            // Set the string using set_string 
+            this.shapes.text.set_string(line, context.context);
+            // Draw but scale down to fit box size
+            this.shapes.text.draw(context, program_state, cube_side.times(Mat4.scale(.18, .18, .18)), this.materials.text_image);
+        }
     }
 
     // Main display function to create objects in the room
@@ -381,6 +400,8 @@ export class DarkHouse extends DarkHouse_Base {
                     program_state.set_camera(this.initial_camera_location);
                     // Get current game state
                     this.getGameState();
+                    // Show live time remaining
+                    this.showLiveTimeRemaining(context, program_state, model_transform);
                     // Initialize game time / update current game time
                     this.updateGameTime(program_state);
                     // Attach light to camera
@@ -407,7 +428,7 @@ export class DarkHouse extends DarkHouse_Base {
                     if (this.victory) {
                         this.gameWonScreen(context, program_state, model_transform);
                     } 
-                    // Otherwise the user lost, so display lost screen
+                    // Otherwise the u-ser lost, so display lost screen
                     else {
                         this.gameLostScreen(context, program_state, model_transform);
                     }
