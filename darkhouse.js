@@ -40,6 +40,11 @@ export class DarkHouse_Base extends Scene {
         this.initial_camera_location = Mat4.look_at(vec3(-10, 1, 0), vec3(0, 0, 0), vec3(0, 1, 0)).times(Mat4.rotation(- Math.PI/2, 1, 0, 0));
     }
 
+    get_eye_location(program_state) {
+        const O = vec4(0, 0, 0, 1), camera_center = program_state.camera_transform.times(O);
+        return camera_center;
+    }
+
     // Setup Game Controls
     make_control_panel() {
         // Show live time
@@ -61,7 +66,7 @@ export class DarkHouse_Base extends Scene {
     }
 
     attach_light_to_camera(program_state) {
-            const light_position = vec4.apply(null, program_state.camera_transform.transposed()[3]);
+            const light_position = this.get_eye_location(program_state);
             program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1)];
     }
 
