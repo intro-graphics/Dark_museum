@@ -992,8 +992,6 @@ const Movement_Controls = defs.Movement_Controls =
             else if(this.pos[2] < -this.bounds)
                 this.thrust[2] = 0.1;
 
-
-            console.log(this.pos[0], this.pos[2]);
             // Move in first-person.  Scale the normal camera aiming speed by dt for smoothness:
             this.first_person_flyaround(dt * r, dt * m);
             // Also apply third-person "arcball" camera mode if a mouse drag is occurring:
