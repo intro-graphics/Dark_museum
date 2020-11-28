@@ -10,6 +10,30 @@ export class DarkHouse_Base extends Scene {
     // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
     constructor() {
         super();
+
+        // Load background music
+        this.background_music = new Audio('background_song.mp3');
+
+        this.startGame = false;
+        this.pauseGame = false;
+        this.endGame = false;
+        this.allObjectsFound = false;
+
+        // For keep tracking of current time in game
+        this.timeUpdated = false;
+        this.gameDuration = 60;
+        this.currentGameTime = 60;
+
+        // For tracking victory
+        this.victory = false;
+
+        // Tracking music state
+        this.musicStarted = false;
+
+        this.torus_speed = -2;
+        this.torus_y = 0;
+
+        // Models
         this.shapes = {
             wall: new Square(),
             cube: new Cube(),
@@ -18,6 +42,13 @@ export class DarkHouse_Base extends Scene {
             object2: new defs.Subdivision_Sphere(2),
             cow: new Shape_From_File("assets/spot_triangulated.obj")
         };
+
+        // For Colliders
+        this.colliders = [
+            {intersect_test: this.intersect_sphere, points: new defs.Subdivision_Sphere(1), leeway: .5},
+            {intersect_test: this.intersect_sphere, points: new defs.Subdivision_Sphere(2), leeway: .3},
+            {intersect_test: this.intersect_cube, points: new defs.Cube(), leeway: .1}
+        ];
 
         // TODO: set better wall material
         this.materials = {
@@ -71,6 +102,53 @@ export class DarkHouse_Base extends Scene {
 
         // Level height for the camera
         this.initial_camera_location = Mat4.look_at(vec3(-10, 3, 0), vec3(0, 3, 0), vec3(0, 1, 0)).times(Mat4.rotation(- Math.PI/2, 1, 0, 0));
+    }
+
+    // Functions for checking Collisions
+    intersect_cube(p, margin = 0) {
+        return p.every(value => value >= -1 - margin && value <= 1 + margin)
+    }
+
+    intersect_sphere(p, margin = 0) {
+        return p.dot(p) < 1 + margin;
+    }
+
+    check_if_colliding(b, collider) {
+        // check_if_colliding(): Collision detection function.
+        // DISCLAIMER:  The collision method shown below is not used by anyone; it's just very quick
+        // to code.  Making every collision body an ellipsoid is kind of a hack, and looping
+        // through a list of discrete sphere points to see if the ellipsoids intersect is *really* a
+        // hack (there are perfectly good analytic expressions that can test if two ellipsoids
+        // intersect without discretizing them into points).
+        if (this == b)
+            return false;
+        // Nothing collides with itself.
+        // Convert sphere b to the frame where a is a unit sphere:
+        const T = this.inverse.times(b.drawn_location, this.temp_matrix);
+
+        const {intersect_test, points, leeway} = collider;
+        // For each vertex in that b, shift to the coordinate frame of
+        // a_inv*b.  Check if in that coordinate frame it penetrates
+        // the unit sphere at the origin.  Leave some leeway.
+        return points.arrays.position.some(p =>
+            intersect_test(T.times(p.to4(1)).to3(), leeway));
+    }
+
+
+    // Function to reset all game controls to initialized state
+    reset() {
+        this.startGame = false;
+        this.pauseGame = false;
+        this.endGame = false;
+        this.allObjectsFound = false;
+        this.timeUpdated = false;
+        this.currentGameTime = 60;
+        this.victory = false;
+        // Pause since game is over
+        this.background_music.pause();
+        // Reinstantiate background music audio file to it can start from the beginning
+        this.background_music = new Audio('background_song.mp3');
+        this.musicStarted = false;
     }
 
     // Setup Game Controls
@@ -141,7 +219,16 @@ export class DarkHouse extends DarkHouse_Base {
         let cube_model_transform = model_transform.times(Mat4.translation(0, 0, 1));
         let cube2_model_transform = model_transform.times(Mat4.translation(12, -10, 1));
 
-        let torus_model_transform = model_transform.times(Mat4.translation(-5, -5, 2)).times(Mat4.scale(2.5, 2.5, 2));
+
+        let torus_model_transform = model_transform
+            .times(Mat4.translation(-10 * Math.sin(this.torus_speed * t / 2 ), -18 * Math.sin(this.torus_speed * t / 2 ), 2))
+            .times(Mat4.scale(2.5, 2.5, 2));
+        const [torus_x, torus_y, torus_z] = torus_model_transform.transposed()[3];
+        // this.torus_y = torus_y;
+        if(torus_y <= -18)
+            this.torus_speed = 2;
+
+
         let cow_model_transform = model_transform.times(Mat4.translation(3, 3, 2)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
 
         this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.texture_sphere);
@@ -208,10 +295,6 @@ export class DarkHouse extends DarkHouse_Base {
         if (defs.canvas_mouse_pos) {
             mouse_x = defs.canvas_mouse_pos[0];
             mouse_y = defs.canvas_mouse_pos[1];
-        }
-
-        if (defs.pos) {
-            console.log(defs.pos);
         }
     }
 }

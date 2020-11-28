@@ -882,31 +882,19 @@ const Movement_Controls = defs.Movement_Controls =
             this.new_line();
             this.new_line();
 
-            this.key_triggered_button("Up", [" "], () => this.thrust[1] = -1, undefined, () => this.thrust[1] = 0);
-            this.key_triggered_button("Forward", ["w"], () => {
-                if (this.pos[2] < this.bounds)
-                    this.thrust[2] = 1;
-                else
-                    this.thrust[2] = 0;
+            this.live_string(box => box.textContent = "Player movement");
+            this.new_line(); this.new_line();
+            this.key_triggered_button("Forward", ["w"], () => {this.thrust[2] = 1;
             }, undefined, () => this.thrust[2] = 0);
             this.new_line();
             this.key_triggered_button("Left", ["a"], () => {
-                if (this.pos[0] < this.bounds)
                     this.thrust[0] = 1;
-                else
-                    this.thrust[0] = 0;
             }, undefined, () => this.thrust[0] = 0);
             this.key_triggered_button("Back", ["s"], () => {
-                if (this.pos[2] > -this.bounds)
                     this.thrust[2] = -1;
-                else
-                    this.thrust[2] = 0;
             }, undefined, () => this.thrust[2] = 0);
             this.key_triggered_button("Right", ["d"], () => {
-                if (this.pos[0] > -this.bounds)
                     this.thrust[0] = -1;
-                else
-                    this.thrust[0] = 0;
             }, undefined, () => this.thrust[0] = 0);
             this.new_line();
             this.key_triggered_button("Down", ["z"], () => this.thrust[1] = 1, undefined, () => this.thrust[1] = 0);
@@ -1019,6 +1007,7 @@ const Movement_Controls = defs.Movement_Controls =
 
         display(context, graphics_state, dt = graphics_state.animation_delta_time / 1000) {
             // The whole process of acting upon controls begins here.
+
             const m = this.speed_multiplier * this.meters_per_frame,
                 r = this.speed_multiplier * this.radians_per_frame;
 
@@ -1031,6 +1020,19 @@ const Movement_Controls = defs.Movement_Controls =
                 this.add_mouse_controls(context.canvas);
                 this.mouse_enabled_canvases.add(context.canvas)
             }
+
+            if(this.pos[0] > this.bounds)
+                this.thrust[0] = -0.1;
+            else if(this.pos[0] < -this.bounds)
+                this.thrust[0] = 0.1;
+
+            if(this.pos[2] > this.bounds)
+                this.thrust[2] = -0.1;
+            else if(this.pos[2] < -this.bounds)
+                this.thrust[2] = 0.1;
+
+
+            console.log(this.pos[0], this.pos[2]);
             // Move in first-person.  Scale the normal camera aiming speed by dt for smoothness:
             this.first_person_flyaround(dt * r, dt * m);
             // Also apply third-person "arcball" camera mode if a mouse drag is occurring:
@@ -1039,6 +1041,7 @@ const Movement_Controls = defs.Movement_Controls =
             // Log some values:
             this.pos = this.inverse().times(vec4(0, 0, 0, 1));
             this.z_axis = this.inverse().times(vec4(0, 0, 1, 0));
+
 
             defs.canvas_mouse_pos = this.mouse.from_center;
             defs.pos = this.pos;
