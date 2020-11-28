@@ -367,6 +367,24 @@ export class DarkHouse extends DarkHouse_Base {
         else if ((this.allObjectsFound) && (this.currentGameTime <= 0)) {
             this.victory = false;
         }
+        // If time has run out	
+        else if (this.currentGameTime <= 0) {	
+            this.endGame = true;	
+            this.victory = false;	
+        }
+    }
+
+    // Set game counter to 60 seconds	
+    updateGameTime(program_state) {	
+        // Initially, set timer to 60s	
+        if (!this.timeUpdated) {	
+            this.currentGameTime = this.gameDuration;	
+            this.timeUpdated = true;	
+        } 	
+        // Once timer is set, decrement the relative change in time per frame from initial time	
+        else {	
+            this.currentGameTime = this.currentGameTime - (program_state.animation_delta_time/1000);	
+        }	
     }
 
     // Display time remaining on top
