@@ -94,13 +94,13 @@ const Controls_Widget = widgets.Controls_Widget =
         // bindings, live readouts of Scene data members, etc.
         constructor(element, scenes) {
             const rules = [".controls-widget * { font-family: monospace }",
-                ".controls-widget div { background: White }",
+                ".controls-widget div { background: black; }",
                 ".controls-widget table { border-collapse: collapse; display:block; overflow-x: auto; table-layout: fixed;}",
                 ".controls-widget table.control-box { width: 1080px; border:1px; margin:0; max-height:380px; " +
-                "transition:.5s; overflow-y:scroll; background:white }",
+                "transition:.5s; overflow-y:scroll; background: black }",
                 ".controls-widget table.control-box:hover { max-height:500px }",
-                ".controls-widget table.control-box td { overflow:hidden; border:1px; background:Black; border-radius:10px; width: 540px;}",
-                ".controls-widget table.control-box td .control-div { background: White; height:338px; padding: 5px 5px 5px 30px; }",
+                ".controls-widget table.control-box td { overflow:hidden; border:1px; background: black; border-radius:10px; width: 540px;}",
+                ".controls-widget table.control-box td .control-div { background: black; color: white; height:338px; padding: 5px 5px 5px 30px; }",
                 ".controls-widget table.control-box td * { background:transparent }",
                 ".controls-widget table.control-box .control-div td { border-radius:unset }",
                 ".controls-widget table.control-box .control-title { padding:7px 40px; color:white; background:#252424;}",
@@ -255,95 +255,95 @@ const Code_Widget = widgets.Code_Widget =
         }
 
         build_reader(element, main_scene, additional_scenes, definitions) {
-            // (Internal helper function)
-            this.definitions = definitions;
-            const code_panel = element.appendChild(document.createElement("div"));
-            code_panel.className = "code-panel";
-            // const text        = code_panel.appendChild( document.createElement( "p" ) );
-            // text.textContent  = "Code for the above scene:";
-            this.code_display = code_panel.appendChild(document.createElement("div"));
-            this.code_display.className = "code-display";
-            // Default textbox contents:
-            this.display_code(main_scene);
+            // // (Internal helper function)
+            // this.definitions = definitions;
+            // const code_panel = element.appendChild(document.createElement("div"));
+            // code_panel.className = "code-panel";
+            // // const text        = code_panel.appendChild( document.createElement( "p" ) );
+            // // text.textContent  = "Code for the above scene:";
+            // this.code_display = code_panel.appendChild(document.createElement("div"));
+            // this.code_display.className = "code-display";
+            // // Default textbox contents:
+            // this.display_code(main_scene);
         }
 
         build_navigator(element, main_scene, additional_scenes, definitions) {
-            // (Internal helper function)
-            const class_list = element.appendChild(document.createElement("table"));
-            class_list.className = "class-list";
-            const top_cell = class_list.insertRow(-1).insertCell(-1);
-            top_cell.colSpan = 2;
-            top_cell.appendChild(document.createTextNode("Click below to navigate through all classes that are defined."));
-            const content = top_cell.appendChild(document.createElement("p"));
-            content.style = "text-align:center; margin:0; font-weight:bold";
-            content.innerHTML = "main-scene.js<br>Main Scene: ";
-            const main_scene_link = content.appendChild(document.createElement("a"));
-            main_scene_link.href = "javascript:void(0);"
-            main_scene_link.addEventListener('click', () => this.display_code(main_scene));
-            main_scene_link.textContent = main_scene.name;
+            // // (Internal helper function)
+            // const class_list = element.appendChild(document.createElement("table"));
+            // class_list.className = "class-list";
+            // const top_cell = class_list.insertRow(-1).insertCell(-1);
+            // top_cell.colSpan = 2;
+            // top_cell.appendChild(document.createTextNode("Click below to navigate through all classes that are defined."));
+            // const content = top_cell.appendChild(document.createElement("p"));
+            // content.style = "text-align:center; margin:0; font-weight:bold";
+            // content.innerHTML = "main-scene.js<br>Main Scene: ";
+            // const main_scene_link = content.appendChild(document.createElement("a"));
+            // main_scene_link.href = "javascript:void(0);"
+            // main_scene_link.addEventListener('click', () => this.display_code(main_scene));
+            // main_scene_link.textContent = main_scene.name;
 
-            const second_cell = class_list.insertRow(-1).insertCell(-1);
-            second_cell.colSpan = 2;
-            second_cell.style = "text-align:center; font-weight:bold";
-            const index_src_link = second_cell.appendChild(document.createElement("a"));
-            index_src_link.href = "javascript:void(0);"
-            index_src_link.addEventListener('click', () => this.display_code());
-            index_src_link.textContent = "This page's complete HTML source";
+            // const second_cell = class_list.insertRow(-1).insertCell(-1);
+            // second_cell.colSpan = 2;
+            // second_cell.style = "text-align:center; font-weight:bold";
+            // const index_src_link = second_cell.appendChild(document.createElement("a"));
+            // index_src_link.href = "javascript:void(0);"
+            // index_src_link.addEventListener('click', () => this.display_code());
+            // index_src_link.textContent = "This page's complete HTML source";
 
-            const third_row = class_list.insertRow(-1);
-            third_row.style = "text-align:center";
-            third_row.innerHTML = "<td><b>tiny-graphics.js</b><br>(Always the same)</td> \
-                             <td><b>All other class definitions from dependencies:</td>";
+            // const third_row = class_list.insertRow(-1);
+            // third_row.style = "text-align:center";
+            // third_row.innerHTML = "<td><b>tiny-graphics.js</b><br>(Always the same)</td> \
+            //                  <td><b>All other class definitions from dependencies:</td>";
 
-            const fourth_row = class_list.insertRow(-1);
-            // Generate the navigator table of links:
-            for (let list of [tiny, definitions]) {
-                const cell = fourth_row.appendChild(document.createElement("td"));
-                // List all class names except the main one, which we'll display separately:
-                const class_names = Object.keys(list).filter(x => x != main_scene.name);
-                cell.style = "white-space:normal"
-                for (let name of class_names) {
-                    const class_link = cell.appendChild(document.createElement("a"));
-                    class_link.style["margin-right"] = "80px"
-                    class_link.href = "javascript:void(0);"
-                    class_link.addEventListener('click', () => this.display_code(tiny[name] || definitions[name]));
-                    class_link.textContent = name;
-                    cell.appendChild(document.createTextNode(" "));
-                }
-            }
+            // const fourth_row = class_list.insertRow(-1);
+            // // Generate the navigator table of links:
+            // for (let list of [tiny, definitions]) {
+            //     const cell = fourth_row.appendChild(document.createElement("td"));
+            //     // List all class names except the main one, which we'll display separately:
+            //     const class_names = Object.keys(list).filter(x => x != main_scene.name);
+            //     cell.style = "white-space:normal"
+            //     for (let name of class_names) {
+            //         const class_link = cell.appendChild(document.createElement("a"));
+            //         class_link.style["margin-right"] = "80px"
+            //         class_link.href = "javascript:void(0);"
+            //         class_link.addEventListener('click', () => this.display_code(tiny[name] || definitions[name]));
+            //         class_link.textContent = name;
+            //         cell.appendChild(document.createTextNode(" "));
+            //     }
+            // }
         }
 
         display_code(class_to_display) {
             // display_code():  Populate the code textbox.
             // Pass undefined to choose index.html source.
-            if (this.associated_editor_widget)
-                this.associated_editor_widget.select_class(class_to_display);
-            if (class_to_display) this.format_code(class_to_display.toString());
-            else fetch(document.location.href)
-                .then(response => response.text())
-                .then(pageSource => this.format_code(pageSource));
+            // if (this.associated_editor_widget)
+            //     this.associated_editor_widget.select_class(class_to_display);
+            // if (class_to_display) this.format_code(class_to_display.toString());
+            // else fetch(document.location.href)
+            //     .then(response => response.text())
+            //     .then(pageSource => this.format_code(pageSource));
         }
 
-        format_code(code_string) {
-            // (Internal helper function)
-            this.code_display.innerHTML = "";
-            const color_map = {
-                string: "chocolate", comment: "green", regex: "blue", number: "magenta",
-                name: "black", punctuator: "red", whitespace: "black"
-            };
+        // format_code(code_string) {
+        //     // (Internal helper function)
+        //     this.code_display.innerHTML = "";
+        //     const color_map = {
+        //         string: "chocolate", comment: "green", regex: "blue", number: "magenta",
+        //         name: "black", punctuator: "red", whitespace: "black"
+        //     };
 
-            for (let t of new Code_Manager(code_string).tokens)
-                if (t.type == "name" && [...Object.keys(tiny), ...Object.keys(this.definitions)].includes(t.value)) {
-                    const link = this.code_display.appendChild(document.createElement('a'));
-                    link.href = "javascript:void(0);"
-                    link.addEventListener('click', () => this.display_code(tiny[t.value] || this.definitions[t.value]));
-                    link.textContent = t.value;
-                } else {
-                    const span = this.code_display.appendChild(document.createElement('span'));
-                    span.style.color = color_map[t.type];
-                    span.textContent = t.value;
-                }
-        }
+        //     for (let t of new Code_Manager(code_string).tokens)
+        //         if (t.type == "name" && [...Object.keys(tiny), ...Object.keys(this.definitions)].includes(t.value)) {
+        //             const link = this.code_display.appendChild(document.createElement('a'));
+        //             link.href = "javascript:void(0);"
+        //             link.addEventListener('click', () => this.display_code(tiny[t.value] || this.definitions[t.value]));
+        //             link.textContent = t.value;
+        //         } else {
+        //             const span = this.code_display.appendChild(document.createElement('span'));
+        //             span.style.color = color_map[t.type];
+        //             span.textContent = t.value;
+        //         }
+        // }
     }
 
 
