@@ -686,10 +686,21 @@ const Phong_Shader = defs.Phong_Shader =
             const O = vec4(0, 0, 0, 1), camera_center = gpu_state.camera_transform.times(O).to3();
             gl.uniform3fv(gpu.camera_center, camera_center);
 
-
+            // const yz_switch = new Mat4(
+            // [1, 0, 0, 0],
+            // [0, 0, 1, 0],
+            // [0, 1, 0, 0],
+            // [0, 0, 0, 1]);
             // send the eye vector to the GPU.
-            const E = vec4(0, 0, 1, 0), camera_direction = gpu_state.camera_transform.times(E).to3()
-            gl.uniform3fv(gpu.camera_direction, camera_direction);
+            const E = vec4(0, 0, 1, 0), inverse_camera_direction = gpu_state.camera_transform.times(E).to3()
+            // const camera_direction = Mat4.translation(camera_center[0], camera_center[1], camera_center[2])
+            //     .times(yz_switch
+            //         .times(Mat4.translation(-camera_center[0], -camera_center[1], -camera_center[2])
+            //             .times(inverse_camera_direction))).to3();
+
+            // console.log(camera_direction)
+            gl.uniform3fv(gpu.camera_direction, inverse_camera_direction);
+
 
             // Use the squared scale trick from "Eric's blog" instead of inverse transpose matrix:
             const squared_scale = model_transform.reduce(

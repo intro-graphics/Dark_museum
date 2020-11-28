@@ -92,7 +92,6 @@ export class DarkHouse_Base extends Scene {
 
         // Keep track of program time
         const t = this.t = program_state.animation_time / 1000;
-        console.log(program_state.lights);
 
         // *** Lights: *** Values of vector or point lights.
         this.attach_light_to_camera(program_state);
