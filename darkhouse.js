@@ -22,14 +22,14 @@ export class DarkHouse_Base extends Scene {
         // TODO: set better wall material
         this.materials = {
             wall_material: new Material(new defs.Phong_Shader(),
-                {ambient: 0.3, diffusivity: 0.3, color: hex_color("#ffffff")}),
+                {ambient: 0.0, diffusivity: 1, specularity: 0.5, color: hex_color("#ffffff")}),
             floor_material: new Material(new defs.Phong_Shader(),
-                {ambient: 0.3, diffusivity: 0.3, color: hex_color("#8a5454")}),
+                {ambient: 0.0, diffusivity: 1, specularity: 0.5, color: hex_color("#8a5454")}),
 
-            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 0.3, diffusivity: 0.3, specularity: 0.5, color: hex_color("#252F2F")}),
+            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 0.0, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
 
-            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 0.3, diffusivity: 0.3, specularity: 0.5, color: hex_color("#0398FC")}),
-            torus_material: new Material(new defs.Phong_Shader(), {ambient: 0.3, diffusivity: 0.3, specularity: 0.5, color: hex_color("#FCBA03")}),
+            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 0.0, diffusivity: 1, specularity: 0.5, color: hex_color("#0398FC")}),
+            torus_material: new Material(new defs.Phong_Shader(), {ambient: 0.0, diffusivity: 1, specularity: 0.5, color: hex_color("#FCBA03")}),
             cow_material: new Material(new defs.Fake_Bump_Map(1), {
                 color: color(.5, .5, .5, 1),
                 ambient: 0.5, diffusivity: 1, specularity: 1, texture: new Texture("assets/spot_texture.png")
@@ -67,7 +67,7 @@ export class DarkHouse_Base extends Scene {
 
     attach_light_to_camera(program_state) {
             const light_position = this.get_eye_location(program_state);
-            program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1)];
+            program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
     }
 
     // Called once per frame of animation
@@ -92,7 +92,7 @@ export class DarkHouse_Base extends Scene {
 
         // Keep track of program time
         const t = this.t = program_state.animation_time / 1000;
-
+        console.log(program_state.lights);
 
         // *** Lights: *** Values of vector or point lights.
         this.attach_light_to_camera(program_state);

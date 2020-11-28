@@ -590,8 +590,8 @@ const Phong_Shader = defs.Phong_Shader =
                 uniform vec4 light_positions_or_vectors[N_LIGHTS], light_colors[N_LIGHTS];
                 uniform float light_attenuation_factors[N_LIGHTS];
                 uniform vec4 shape_color;
-                uniform vec3 squared_scale, camera_center;
-                float u_limit = 0.0;
+                uniform vec3 squared_scale, camera_center, camera_direction;
+                float u_limit = 0.95;
         
                 // Specifier "varying" means a variable's final value will be passed from the vertex shader
                 // on to the next phase (fragment shader), then interpolated per-fragment, weighted by the
@@ -614,9 +614,9 @@ const Phong_Shader = defs.Phong_Shader =
                         float distance_to_light = length( surface_to_light_vector );
                         
                         vec3 surfaceToLightDirection = normalize(surface_to_light_vector);
-                        vec3 u_lightDirection = normalize(vec3(light_positions_or_vectors[i].xyz));
+                        vec3 u_lightDirection = normalize(camera_direction);
                         float dotFromDirection = dot(surfaceToLightDirection,
-                               -u_lightDirection);
+                               u_lightDirection);
             
                         vec3 L = normalize( surface_to_light_vector );
                         vec3 H = normalize( L + E );
@@ -628,9 +628,9 @@ const Phong_Shader = defs.Phong_Shader =
                         
                         vec3 light_contribution = shape_color.xyz * light_colors[i].xyz * diffusivity * diffuse
                                                                   + light_colors[i].xyz * specularity * specular;
-                        // if (dotFromDirection < u_limit) {
-                        //     attenuation = 0.0;
-                        // }
+                        if (dotFromDirection < u_limit) {
+                            attenuation = 0.0;
+                        }
                         
                         result += attenuation * light_contribution;
                         
@@ -686,8 +686,9 @@ const Phong_Shader = defs.Phong_Shader =
             const O = vec4(0, 0, 0, 1), camera_center = gpu_state.camera_transform.times(O).to3();
             gl.uniform3fv(gpu.camera_center, camera_center);
 
+
             // send the eye vector to the GPU.
-            const E = vec4(0, 0, 1, 0), camera_direction = gpu_state.camera_transform.times(E).to3();
+            const E = vec4(0, 0, 1, 0), camera_direction = gpu_state.camera_transform.times(E).to3()
             gl.uniform3fv(gpu.camera_direction, camera_direction);
 
             // Use the squared scale trick from "Eric's blog" instead of inverse transpose matrix:
