@@ -225,17 +225,25 @@ export class DarkHouse extends DarkHouse_Base {
         let cube_model_transform = model_transform.times(Mat4.translation(0, 0, 1));
         let cube2_model_transform = model_transform.times(Mat4.translation(12, -10, 1));
 
-
         let torus_model_transform = model_transform
             .times(Mat4.translation(-10 * Math.sin(this.torus_speed * t / 2 ), -18 * Math.sin(this.torus_speed * t / 2 ), 2))
             .times(Mat4.scale(2.5, 2.5, 2));
+        let cow_model_transform = model_transform.times(Mat4.translation(3, 3, 2)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
+
         const [torus_x, torus_y, torus_z] = torus_model_transform.transposed()[3];
         // this.torus_y = torus_y;
         if(torus_y <= -18)
             this.torus_speed = 2;
 
 
-        let cow_model_transform = model_transform.times(Mat4.translation(3, 3, 2)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
+        this.detect_Collision(sphere_model_transform.transposed()[3], defs.pos, 1);
+        this.detect_Collision(sphere2_model_transform.transposed()[3], defs.pos, 1);
+        this.detect_Collision(cube_model_transform.transposed()[3], defs.pos, 1);
+        this.detect_Collision(cube2_model_transform.transposed()[3], defs.pos, 1);
+        this.detect_Collision(cow_model_transform.transposed()[3], defs.pos, 1);
+
+
+
 
         this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.texture_sphere);
         this.shapes.object2.draw(context, program_state, sphere2_model_transform, this.materials.texture_minecraft);
@@ -245,6 +253,23 @@ export class DarkHouse extends DarkHouse_Base {
 
         this.shapes.torus.draw(context, program_state, torus_model_transform, this.materials.texture_UFO);
         this.shapes.cow.draw(context, program_state, cow_model_transform, this.materials.cow_material);
+
+
+    }
+
+    detect_Collision(center, curr_pos, margin){
+        if( ( center[1] - margin < curr_pos[0] && curr_pos[0] < center[1] + margin ) &&
+            ( center[0] - margin < curr_pos[2] && curr_pos[2] < center[0] + margin )) {
+            if(defs.thrust[0] == -1)
+                defs.thrust[0] = 0.1;
+            if(defs.thrust[0] == 1)
+                defs.thrust[0] = -0.1;
+
+            if(defs.thrust[2] == -1)
+                defs.thrust[2] = 0.1;
+            if(defs.thrust[2] == 1)
+                defs.thrust[2] = -0.1;
+        }
     }
 
     // Helper method to create room
