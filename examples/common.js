@@ -824,6 +824,16 @@ const Movement_Controls = defs.Movement_Controls =
             // Define bounds of the room
             this.bounds = 16;
 
+            //Define bounds of objects
+            this.objbounds = {
+                obj1: {x1: 0, x2: -3, y1: 0, y2: -3}, //rubix cube
+                obj2: {x1: 5, x2: 2, y1: 5, y2: 2}, //globe
+                obj3: {x1: 3, x2: 1, y1: 3, y2: 0}, //cow
+                obj4: {x1: 6, x2: 3, y1: -6, y2: -3}, //sphere
+                obj5: {x1: 12, x2: 9, y1: -10, y2: -13} //box
+            }
+
+
             this.mouse_enabled_canvases = new Set();
             this.will_take_over_graphics_state = true;
         }
@@ -982,6 +992,7 @@ const Movement_Controls = defs.Movement_Controls =
                 this.mouse_enabled_canvases.add(context.canvas)
             }
 
+            //detect bounds
             if(this.pos[0] > this.bounds)
                 this.thrust[0] = -0.1;
             else if(this.pos[0] < -this.bounds)
@@ -991,6 +1002,9 @@ const Movement_Controls = defs.Movement_Controls =
                 this.thrust[2] = -0.1;
             else if(this.pos[2] < -this.bounds)
                 this.thrust[2] = 0.1;
+
+            //detect obj bounds
+            
 
             // Move in first-person.  Scale the normal camera aiming speed by dt for smoothness:
             this.first_person_flyaround(dt * r, dt * m);
