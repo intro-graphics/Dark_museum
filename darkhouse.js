@@ -84,6 +84,13 @@ export class DarkHouse_Base extends Scene {
                 texture: new Texture("assets/UFO.jpg")
             }),
 
+            //painting textures
+            texture_painting1: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/starrynight.jpg")
+            }),
+
             sphere_material: new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
             
             cube_material:  new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#0398FC")}),
@@ -218,6 +225,9 @@ export class DarkHouse extends DarkHouse_Base {
         let torus_model_transform = model_transform.times(Mat4.translation(-5, -5, 2)).times(Mat4.scale(2.5, 2.5, 2));
         let cow_model_transform = model_transform.times(Mat4.translation(3, 3, 2)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
 
+        //painting model transform
+        let cube3_model_transform = model_transform.times(Mat4.translation(16, 0, 6)).times(Mat4.rotation(Math.PI/2, 1, 0, 0)).times(Mat4.scale(0.1, 4, 7));
+
         this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.texture_sphere);
         this.shapes.object2.draw(context, program_state, sphere2_model_transform, this.materials.texture_minecraft);
 
@@ -226,6 +236,9 @@ export class DarkHouse extends DarkHouse_Base {
 
         this.shapes.torus.draw(context, program_state, torus_model_transform, this.materials.texture_UFO);
         this.shapes.cow.draw(context, program_state, cow_model_transform, this.materials.cow_material);
+
+        //paintings
+        this.shapes.cube.draw(context, program_state, cube3_model_transform, this.materials.texture_painting1);
     }
 
     // Helper method to create room
