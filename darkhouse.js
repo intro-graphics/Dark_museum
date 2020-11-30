@@ -218,6 +218,7 @@ export class DarkHouse extends DarkHouse_Base {
     // Create Objects 
     createObjectsInRoom(context, program_state, model_transform) {
         const t = program_state.animation_time / 1000;
+        this.centers = [];
 
         let sphere_model_transform = model_transform.times(Mat4.translation(5, 5, 1)).times(Mat4.rotation(Math.PI/2, 1, 0, 0)).times(Mat4.rotation(Math.PI/2*t, 0, 1, 0));
         let sphere2_model_transform = model_transform.times(Mat4.translation(6, -6, 1));
@@ -234,8 +235,21 @@ export class DarkHouse extends DarkHouse_Base {
         if(torus_y <= -18)
             this.torus_speed = 2;
 
-
         let cow_model_transform = model_transform.times(Mat4.translation(3, 3, 2)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
+
+        this.centers.push(sphere_model_transform.transposed()[3]);
+        this.centers.push(sphere2_model_transform.transposed()[3]);
+        this.centers.push(cube_model_transform.transposed()[3]);
+        this.centers.push(cube2_model_transform.transposed()[3]);
+        this.centers.push(torus_model_transform.transposed()[3]);
+        this.distances = this.centers.map((pos) => {
+            return Math.sqrt(
+                (defs.pos[0] - pos[1]) ** 2 +
+                (defs.pos[2] - pos[0]) ** 2
+            );
+        });
+        if (this.distances.some((dist) => dist < 3 ))
+            defs.thrust[0] = -1;
 
         this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.texture_sphere);
         this.shapes.object2.draw(context, program_state, sphere2_model_transform, this.materials.texture_minecraft);

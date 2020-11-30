@@ -894,17 +894,34 @@ const Movement_Controls = defs.Movement_Controls =
 
             this.live_string(box => box.textContent = "Player movement");
             this.new_line(); this.new_line();
-            this.key_triggered_button("Forward", ["w"], () => {this.thrust[2] = 1;
-            }, undefined, () => this.thrust[2] = 0);
+            this.key_triggered_button("Forward", ["w"], () => {
+                this.forward = true;
+                this.thrust[2] = 1;
+            }, undefined, () => {
+                this.forward = false;    
+                this.thrust[2] = 0;
+            });
             this.key_triggered_button("Left", ["a"], () => {
-                    this.thrust[0] = 1;
-            }, undefined, () => this.thrust[0] = 0);
+                this.left = true;
+                this.thrust[0] = 1;
+            }, undefined, () => {
+                    this.left = false;
+                this.thrust[0] = 0
+            });
             this.key_triggered_button("Back", ["s"], () => {
-                    this.thrust[2] = -1;
-            }, undefined, () => this.thrust[2] = 0);
+                this.backward = true;
+                this.thrust[2] = -1;
+            }, undefined, () => {
+                this.backward = false;
+                this.thrust[2] = 0
+            });
             this.key_triggered_button("Right", ["d"], () => {
-                    this.thrust[0] = -1;
-            }, undefined, () => this.thrust[0] = 0);
+                this.right = true;
+                this.thrust[0] = -1;
+            }, undefined, () => {
+                this.right = false;
+                this.thrust[0] = 0
+            });
             this.new_line(); this.new_line();
 
             this.live_string(box => box.textContent = "Camera movement");
@@ -993,15 +1010,24 @@ const Movement_Controls = defs.Movement_Controls =
             }
 
             //detect bounds
-            if(this.pos[0] > this.bounds)
+            if (this.pos[0] > this.bounds && this.left)
                 this.thrust[0] = -0.1;
-            else if(this.pos[0] < -this.bounds)
+            else if(this.pos[0] < -this.bounds && this.right) 
                 this.thrust[0] = 0.1;
 
-            if(this.pos[2] > this.bounds)
+            if(this.pos[2] > this.bounds && this.forward)
                 this.thrust[2] = -0.1;
-            else if(this.pos[2] < -this.bounds)
+            else if(this.pos[2] < -this.bounds && this.backward)
                 this.thrust[2] = 0.1;
+            
+            defs.canvas_mouse_pos = this.mouse.from_center;
+            defs.pos = this.pos;
+            defs.thrust = this.thrust;
+            defs.forward = this.forward;
+            defs.backward = this.backward;
+            defs.left = this.left;
+            defs.right = this.right;
+            defs.backward = this.backward;
 
             //detect obj bounds
             
@@ -1014,10 +1040,6 @@ const Movement_Controls = defs.Movement_Controls =
             // Log some values:
             this.pos = this.inverse().times(vec4(0, 0, 0, 1));
             this.z_axis = this.inverse().times(vec4(0, 0, 1, 0));
-
-
-            defs.canvas_mouse_pos = this.mouse.from_center;
-            defs.pos = this.pos;
         }
     }
 
