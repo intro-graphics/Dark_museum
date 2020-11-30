@@ -40,6 +40,10 @@ export class DarkHouse_Base extends Scene {
             object1: new defs.Subdivision_Sphere(4),
             object2: new defs.Subdivision_Sphere(2),
             cow: new Shape_From_File("assets/spot_triangulated.obj"),
+            pedestal: new Shape_From_File("assets/Pedestal.obj"),
+            statue: new Shape_From_File("assets/thinker.obj"),
+            vase: new Shape_From_File("assets/vase.obj"),
+            bull: new Shape_From_File("assets/wallstreetbull.obj"),
             text: new Text_Line(35)
         };
 
@@ -47,12 +51,7 @@ export class DarkHouse_Base extends Scene {
         this.materials = {
             wall_material: new Material(new defs.Phong_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
-            
-            texture_wall: new Material(new Textured_Phong(), {
-                color: hex_color("#ffffff"),
-                ambient: .5, diffusivity: 0.1, specularity: 0.1,
-                texture: new Texture("assets/brick-wall.jpg")
-            }),
+
 
             texture_box: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
@@ -84,11 +83,68 @@ export class DarkHouse_Base extends Scene {
                 texture: new Texture("assets/UFO.jpg")
             }),
 
+
+            //museum floor/wall texture
+            texture_floor: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/floor.jpeg")
+            }),
+
+            texture_wall: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .5, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/marble.jpg")
+            }),
+
+
             //painting textures
             texture_painting1: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
                 ambient: .3, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/starrynight.jpg")
+            }),
+            texture_painting2: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/monalisa.jpg")
+            }),
+
+            texture_painting3: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/monet1.jpg")
+            }),
+
+            texture_painting4: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/irises.jpg")
+            }),
+
+            //statue and figures textures
+            texture_pedestal: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/pedestal.jpg")
+            }),
+
+            texture_statue: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/thinker_diffuse.jpg")
+            }),
+
+            texture_vase: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/china.jpg")
+            }),
+
+            texture_bull: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/chargingbull.jpg")
             }),
 
             sphere_material: new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
@@ -225,8 +281,16 @@ export class DarkHouse extends DarkHouse_Base {
         let torus_model_transform = model_transform.times(Mat4.translation(-5, -5, 2)).times(Mat4.scale(2.5, 2.5, 2));
         let cow_model_transform = model_transform.times(Mat4.translation(3, 3, 2)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
 
-        //painting model transform
-        let cube3_model_transform = model_transform.times(Mat4.translation(16, 0, 6)).times(Mat4.rotation(Math.PI/2, 1, 0, 0)).times(Mat4.scale(0.1, 4, 7));
+        //painting model transforms
+        let painting1_model_transform = model_transform.times(Mat4.translation(19, 0, 9)).times(Mat4.rotation(Math.PI/2, 1, 0, 0)).times(Mat4.scale(0.1, 4, 7));
+        let painting2_model_transform = model_transform.times(Mat4.translation(19, 13, 6)).times(Mat4.rotation(Math.PI/2, 1, 0, 0)).times(Mat4.scale(0.1, 4, 3));
+        let painting3_model_transform = model_transform.times(Mat4.translation(5, 19, 6)).times(Mat4.rotation(Math.PI/2, 1, 0, 0)).times(Mat4.scale(4, 5, 0.1));
+        let painting4_model_transform = model_transform.times(Mat4.translation(-6, 19, 7)).times(Mat4.rotation(Math.PI/2, 1, 0, 0)).times(Mat4.scale(4, 3, 0.1));
+
+        let pedestal_model_transform = model_transform.times(Mat4.translation(16, -16, 0)).times(Mat4.scale(3, 3, 5));
+        let statue_model_transform = model_transform.times(Mat4.translation(-16, -16, 6)).times(Mat4.rotation(Math.PI*2, 0, 0, 1)).times(Mat4.scale(-3, -3, 3));
+        let vase_model_transform = model_transform.times(Mat4.translation(16, -16, 10)).times(Mat4.scale(1.2, 1.2, 1.2));
+        let bull_model_transform = model_transform.times(Mat4.translation(-13, 10, 3)).times(Mat4.scale(3, 3, 3));
 
         this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.texture_sphere);
         this.shapes.object2.draw(context, program_state, sphere2_model_transform, this.materials.texture_minecraft);
@@ -238,13 +302,20 @@ export class DarkHouse extends DarkHouse_Base {
         this.shapes.cow.draw(context, program_state, cow_model_transform, this.materials.cow_material);
 
         //paintings
-        this.shapes.cube.draw(context, program_state, cube3_model_transform, this.materials.texture_painting1);
+        this.shapes.cube.draw(context, program_state, painting1_model_transform, this.materials.texture_painting1);
+        this.shapes.cube.draw(context, program_state, painting2_model_transform, this.materials.texture_painting2);
+        this.shapes.cube.draw(context, program_state, painting3_model_transform, this.materials.texture_painting3);
+        this.shapes.cube.draw(context, program_state, painting4_model_transform, this.materials.texture_painting4);
+        this.shapes.pedestal.draw(context, program_state, pedestal_model_transform, this.materials.texture_pedestal);
+        this.shapes.statue.draw(context, program_state, statue_model_transform, this.materials.texture_statue);
+        this.shapes.vase.draw(context, program_state, vase_model_transform, this.materials.texture_vase);
+        this.shapes.bull.draw(context, program_state, bull_model_transform, this.materials.texture_bull);
     }
 
     // Helper method to create room
     createRoom(context, program_state, model_transform){
         let wall_model_transform_1 = model_transform.times(Mat4.scale(20, 20, 20));
-        this.shapes.wall.draw(context, program_state, wall_model_transform_1, this.materials.texture_wall);
+        this.shapes.wall.draw(context, program_state, wall_model_transform_1, this.materials.texture_floor);
 
         let wall_model_transform_2 = wall_model_transform_1
             .times(Mat4.translation(1,0,1))

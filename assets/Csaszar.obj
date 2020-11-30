@@ -1,0 +1,33 @@
+# This file encodes a simplicial torus where every pair of vertices is
+# connected by an edge.  It was originally described in the paper
+# 
+#    Ákos Császar, "A Polyhedron without Diagonals," Acta Sci. Math (1949)
+#
+# Vertex coordinates, indices, and faces are precisely as described in this
+# paper.  Note, however, that the faces are not globally oriented, which may
+# cause problems with software that does not check for orientation.  See the
+# file Csaszar-oriented.obj for an oriented version.
+#
+# (Keenan Crane - May 21, 2015)
+#
+v -3  3  0
+v -3 -3  1
+v -1 -2  3
+v  1  2  3
+v  3  3  1
+v  3 -3  0
+v  0  0  15
+f 1 2 6
+f 2 3 5
+f 3 5 6
+f 3 4 6
+f 4 6 7
+f 2 3 7
+f 2 6 7
+f 1 5 6
+f 2 4 5
+f 1 2 4
+f 1 3 4
+f 1 3 7
+f 4 5 7
+f 1 5 7
