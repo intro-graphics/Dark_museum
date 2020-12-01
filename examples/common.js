@@ -836,6 +836,11 @@ const Movement_Controls = defs.Movement_Controls =
 
             this.mouse_enabled_canvases = new Set();
             this.will_take_over_graphics_state = true;
+
+            this.left = false;
+            this.right = false;
+            this.forward = false;
+            this.backward = false;
         }
 
         set_recipient(matrix_closure, inverse_closure) {
@@ -900,12 +905,13 @@ const Movement_Controls = defs.Movement_Controls =
             }, undefined, () => {
                 this.forward = false;    
                 this.thrust[2] = 0;
+                
             });
             this.key_triggered_button("Left", ["a"], () => {
                 this.left = true;
                 this.thrust[0] = 1;
             }, undefined, () => {
-                    this.left = false;
+                this.left = false;
                 this.thrust[0] = 0
             });
             this.key_triggered_button("Back", ["s"], () => {
@@ -1008,7 +1014,7 @@ const Movement_Controls = defs.Movement_Controls =
                 this.add_mouse_controls(context.canvas);
                 this.mouse_enabled_canvases.add(context.canvas)
             }
-
+    
             //detect bounds
             if (this.pos[0] > this.bounds && this.left)
                 this.thrust[0] = -0.1;
@@ -1019,23 +1025,17 @@ const Movement_Controls = defs.Movement_Controls =
                 this.thrust[2] = -0.1;
             else if(this.pos[2] < -this.bounds && this.backward)
                 this.thrust[2] = 0.1;
-            
-            defs.canvas_mouse_pos = this.mouse.from_center;
-            defs.pos = this.pos;
-            defs.thrust = this.thrust;
+
+            // Variables required for darkhouse.js
             defs.forward = this.forward;
             defs.backward = this.backward;
             defs.left = this.left;
             defs.right = this.right;
-            defs.backward = this.backward;
-
-            //detect obj bounds
-            
 
             defs.canvas_mouse_pos = this.mouse.from_center;
             defs.pos = this.pos;
             defs.thrust = this.thrust;
-
+            
             // Move in first-person.  Scale the normal camera aiming speed by dt for smoothness:
             this.first_person_flyaround(dt * r, dt * m);
             // Also apply third-person "arcball" camera mode if a mouse drag is occurring:
