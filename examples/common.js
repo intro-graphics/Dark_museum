@@ -824,6 +824,16 @@ const Movement_Controls = defs.Movement_Controls =
             // Define bounds of the room
             this.bounds = 16;
 
+            //Define bounds of objects
+            this.objbounds = {
+                obj1: {x1: 0, x2: -3, y1: 0, y2: -3}, //rubix cube
+                obj2: {x1: 5, x2: 2, y1: 5, y2: 2}, //globe
+                obj3: {x1: 3, x2: 1, y1: 3, y2: 0}, //cow
+                obj4: {x1: 6, x2: 3, y1: -6, y2: -3}, //sphere
+                obj5: {x1: 12, x2: 9, y1: -10, y2: -13} //box
+            }
+
+
             this.mouse_enabled_canvases = new Set();
             this.will_take_over_graphics_state = true;
         }
@@ -884,17 +894,34 @@ const Movement_Controls = defs.Movement_Controls =
 
             this.live_string(box => box.textContent = "Player movement");
             this.new_line(); this.new_line();
-            this.key_triggered_button("Forward", ["w"], () => {this.thrust[2] = 1;
-            }, undefined, () => this.thrust[2] = 0);
+            this.key_triggered_button("Forward", ["w"], () => {
+                this.forward = true;
+                this.thrust[2] = 1;
+            }, undefined, () => {
+                this.forward = false;    
+                this.thrust[2] = 0;
+            });
             this.key_triggered_button("Left", ["a"], () => {
-                    this.thrust[0] = 1;
-            }, undefined, () => this.thrust[0] = 0);
+                this.left = true;
+                this.thrust[0] = 1;
+            }, undefined, () => {
+                    this.left = false;
+                this.thrust[0] = 0
+            });
             this.key_triggered_button("Back", ["s"], () => {
-                    this.thrust[2] = -1;
-            }, undefined, () => this.thrust[2] = 0);
+                this.backward = true;
+                this.thrust[2] = -1;
+            }, undefined, () => {
+                this.backward = false;
+                this.thrust[2] = 0
+            });
             this.key_triggered_button("Right", ["d"], () => {
-                    this.thrust[0] = -1;
-            }, undefined, () => this.thrust[0] = 0);
+                this.right = true;
+                this.thrust[0] = -1;
+            }, undefined, () => {
+                this.right = false;
+                this.thrust[0] = 0
+            });
             this.new_line(); this.new_line();
 
             this.live_string(box => box.textContent = "Camera movement");
@@ -982,15 +1009,28 @@ const Movement_Controls = defs.Movement_Controls =
                 this.mouse_enabled_canvases.add(context.canvas)
             }
 
-            if(this.pos[0] > this.bounds)
+            //detect bounds
+            if (this.pos[0] > this.bounds && this.left)
                 this.thrust[0] = -0.1;
-            else if(this.pos[0] < -this.bounds)
+            else if(this.pos[0] < -this.bounds && this.right) 
                 this.thrust[0] = 0.1;
 
-            if(this.pos[2] > this.bounds)
+            if(this.pos[2] > this.bounds && this.forward)
                 this.thrust[2] = -0.1;
-            else if(this.pos[2] < -this.bounds)
+            else if(this.pos[2] < -this.bounds && this.backward)
                 this.thrust[2] = 0.1;
+            
+            defs.canvas_mouse_pos = this.mouse.from_center;
+            defs.pos = this.pos;
+            defs.thrust = this.thrust;
+            defs.forward = this.forward;
+            defs.backward = this.backward;
+            defs.left = this.left;
+            defs.right = this.right;
+            defs.backward = this.backward;
+
+            //detect obj bounds
+            
 
             defs.canvas_mouse_pos = this.mouse.from_center;
             defs.pos = this.pos;
