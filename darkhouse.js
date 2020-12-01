@@ -47,53 +47,53 @@ export class DarkHouse_Base extends Scene {
         this.materials = {
             wall_material: new Material(new defs.Phong_Shader(),
 
-                { ambient: 0, diffusivity: .6, color: hex_color("#ffffff") }),
+                { ambient: 0, diffusivity: 0.9, color: hex_color("#ffffff") }),
             
             texture_wall: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 0.1, specularity: 0.1,
+                ambient: 0, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/brick-wall.jpg")
             }),
 
             texture_box: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 0.1, specularity: 0.1,
+                ambient: 0, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/rubiks-cube.png")
             }),
 
             texture_sphere: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 0.1, specularity: 0.1,
+                ambient: 0, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/earth.gif")
             }),
 
             texture_minecraft: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 0.1, specularity: 0.1,
+                ambient: 0, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/minecraft.jpg")
             }),
 
             texture_woodbox: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 0.1, specularity: 0.1,
+                ambient: 0, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/woodbox.jpg")
             }),
 
             texture_UFO: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 0.1, specularity: 0.1,
+                ambient: 0, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/UFO.jpg")
             }),
 
-            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 0, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
+            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 0, diffusivity: 0.9, specularity: 0.5, color: hex_color("#252F2F")}),
             
-            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 0, diffusivity: 1, specularity: 0.5, color: hex_color("#0398FC")}),
+            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 0, diffusivity: 0.9, specularity: 0.5, color: hex_color("#0398FC")}),
             
-            torus_material: new Material(new defs.Phong_Shader(), {ambient: 0, diffusivity: 1, specularity: 0.5, color: hex_color("#FCBA03")}),
+            torus_material: new Material(new defs.Phong_Shader(), {ambient: 0, diffusivity: 0.9, specularity: 0.5, color: hex_color("#FCBA03")}),
             
             cow_material: new Material(new defs.Fake_Bump_Map(1), {
                 color: color(.5, .5, .5, 1),
-                ambient: 0, diffusivity: 1, specularity: 1, texture: new Texture("assets/spot_texture.png")
+                ambient: 0, diffusivity: 0.9, specularity: 1, texture: new Texture("assets/spot_texture.png")
             }),
 
             start_background: new Material(new Phong_Shader(), {
@@ -215,11 +215,7 @@ export class DarkHouse_Base extends Scene {
 
 
 export class DarkHouse extends DarkHouse_Base {
-    // Ensure that light position is equal to camera position
-    attach_light_to_camera(program_state) {
-        const light_position = vec4.apply(null, program_state.camera_transform.transposed()[3]);
-        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1)];
-    }
+
     
     // Create Objects 
     createObjectsInRoom(context, program_state, model_transform) {
@@ -425,7 +421,7 @@ export class DarkHouse extends DarkHouse_Base {
                     // Initialize game time / update current game time
                     this.updateGameTime(program_state);
                     // Attach light to camera
-                    this.attach_light_to_camera(program_state);
+                    // this.attach_light_to_camera(program_state);
                     // Create main room object
                     this.createRoom(context, program_state, model_transform);
                     // Create objects in the room
