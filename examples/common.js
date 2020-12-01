@@ -844,11 +844,14 @@ const Movement_Controls = defs.Movement_Controls =
         constructor() {
             super();
             const data_members = {
-                roll: 0, look_around_locked: true,
+                rollz: 0, rolly: 0, rollx: 0, look_around_locked: true,
                 thrust: vec3(0, 0, 0), pos: vec3(0, 0, 0), z_axis: vec3(0, 0, 0),
                 radians_per_frame: 1 / 200, meters_per_frame: 20, speed_multiplier: 1
             };
             Object.assign(this, data_members);
+
+            // Define bounds of the room
+            this.bounds = 16;
 
             this.mouse_enabled_canvases = new Set();
             this.will_take_over_graphics_state = true;
@@ -908,58 +911,46 @@ const Movement_Controls = defs.Movement_Controls =
             this.new_line();
             this.new_line();
 
-            this.key_triggered_button("Up", [" "], () => this.thrust[1] = -1, undefined, () => this.thrust[1] = 0);
-            this.key_triggered_button("Forward", ["w"], () => this.thrust[2] = 1, undefined, () => this.thrust[2] = 0);
-            this.new_line();
-            this.key_triggered_button("Left", ["a"], () => this.thrust[0] = 1, undefined, () => this.thrust[0] = 0);
-            this.key_triggered_button("Back", ["s"], () => this.thrust[2] = -1, undefined, () => this.thrust[2] = 0);
-            this.key_triggered_button("Right", ["d"], () => this.thrust[0] = -1, undefined, () => this.thrust[0] = 0);
-            this.new_line();
-            this.key_triggered_button("Down", ["z"], () => this.thrust[1] = 1, undefined, () => this.thrust[1] = 0);
+            this.live_string(box => box.textContent = "Player movement");
+            this.new_line(); this.new_line();
+            this.key_triggered_button("Forward", ["w"], () => {
+                if (this.pos[2] < this.bounds)
+                    this.thrust[2] = 1;
+                else
+                    this.thrust[2] = 0;
+            }, undefined, () => this.thrust[2] = 0);
+            this.key_triggered_button("Left", ["a"], () => {
+                if (this.pos[0] < this.bounds)
+                    this.thrust[0] = 1;
+                else
+                    this.thrust[0] = 0;
+            }, undefined, () => this.thrust[0] = 0);
+            this.key_triggered_button("Back", ["s"], () => {
+                if (this.pos[2] > -this.bounds)
+                    this.thrust[2] = -1;
+                else
+                    this.thrust[2] = 0;
+            }, undefined, () => this.thrust[2] = 0);
+            this.key_triggered_button("Right", ["d"], () => {
+                if (this.pos[0] > -this.bounds)
+                    this.thrust[0] = -1;
+                else
+                    this.thrust[0] = 0;
+            }, undefined, () => this.thrust[0] = 0);
+            this.new_line(); this.new_line();
 
-            const speed_controls = this.control_panel.appendChild(document.createElement("span"));
-            speed_controls.style.margin = "30px";
-            this.key_triggered_button("-", ["o"], () =>
-                this.speed_multiplier /= 1.2, undefined, undefined, undefined, speed_controls);
-            this.live_string(box => {
-                box.textContent = "Speed: " + this.speed_multiplier.toFixed(2)
-            }, speed_controls);
-            this.key_triggered_button("+", ["p"], () =>
-                this.speed_multiplier *= 1.2, undefined, undefined, undefined, speed_controls);
+            this.live_string(box => box.textContent = "Camera movement");
+            this.new_line(); this.new_line();
+            this.key_triggered_button("Roll +z", [","], () => this.rollz = 1, undefined, () => this.rollz = 0);
+            this.key_triggered_button("Roll -z", ["."], () => this.rollz = -1, undefined, () => this.rollz = 0);
             this.new_line();
-            this.key_triggered_button("Roll left", [","], () => this.roll = 1, undefined, () => this.roll = 0);
-            this.key_triggered_button("Roll right", ["."], () => this.roll = -1, undefined, () => this.roll = 0);
+            this.key_triggered_button("Roll +y", ["n"], () => this.rolly = 1, undefined, () => this.rolly = 0);
+            this.key_triggered_button("Roll -y", ["m"], () => this.rolly = -1, undefined, () => this.rolly = 0);
+            this.new_line();
+            this.key_triggered_button("Roll +x", ["v"], () => this.rollx = 1, undefined, () => this.rollx = 0);
+            this.key_triggered_button("Roll -x", ["b"], () => this.rollx = -1, undefined, () => this.rollx = 0);
             this.new_line();
             this.key_triggered_button("(Un)freeze mouse look around", ["f"], () => this.look_around_locked ^= 1, "#8B8885");
-            this.new_line();
-            this.key_triggered_button("Go to world origin", ["r"], () => {
-                this.matrix().set_identity(4, 4);
-                this.inverse().set_identity(4, 4)
-            }, "#8B8885");
-            this.new_line();
-
-            this.key_triggered_button("Look at origin from front", ["1"], () => {
-                this.inverse().set(Mat4.look_at(vec3(0, 0, 10), vec3(0, 0, 0), vec3(0, 1, 0)));
-                this.matrix().set(Mat4.inverse(this.inverse()));
-            }, "#8B8885");
-            this.new_line();
-            this.key_triggered_button("from right", ["2"], () => {
-                this.inverse().set(Mat4.look_at(vec3(10, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0)));
-                this.matrix().set(Mat4.inverse(this.inverse()));
-            }, "#8B8885");
-            this.key_triggered_button("from rear", ["3"], () => {
-                this.inverse().set(Mat4.look_at(vec3(0, 0, -10), vec3(0, 0, 0), vec3(0, 1, 0)));
-                this.matrix().set(Mat4.inverse(this.inverse()));
-            }, "#8B8885");
-            this.key_triggered_button("from left", ["4"], () => {
-                this.inverse().set(Mat4.look_at(vec3(-10, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0)));
-                this.matrix().set(Mat4.inverse(this.inverse()));
-            }, "#8B8885");
-            this.new_line();
-            this.key_triggered_button("Attach to global camera", ["Shift", "R"],
-                () => {
-                    this.will_take_over_graphics_state = true
-                }, "#8B8885");
             this.new_line();
         }
 
@@ -982,8 +973,18 @@ const Movement_Controls = defs.Movement_Controls =
                     this.matrix().post_multiply(Mat4.rotation(-velocity, i, 1 - i, 0));
                     this.inverse().pre_multiply(Mat4.rotation(+velocity, i, 1 - i, 0));
                 }
-            this.matrix().post_multiply(Mat4.rotation(-.1 * this.roll, 0, 0, 1));
-            this.inverse().pre_multiply(Mat4.rotation(+.1 * this.roll, 0, 0, 1));
+
+
+            this.matrix().post_multiply(Mat4.rotation(-.1 * this.rollz, 0, 0, 1));
+            this.inverse().pre_multiply(Mat4.rotation(+.1 * this.rollz, 0, 0, 1));
+
+            this.matrix().post_multiply(Mat4.rotation(-.1 * this.rolly, 0, 1, 0));
+            this.inverse().pre_multiply(Mat4.rotation(+.1 * this.rolly, 0, 1, 0));
+
+            this.matrix().post_multiply(Mat4.rotation(-.1 * this.rollx, 1, 0, 0));
+            this.inverse().pre_multiply(Mat4.rotation(+.1 * this.rollx, 1, 0, 0));
+
+
             // Now apply translation movement of the camera, in the newest local coordinate frame.
             this.matrix().post_multiply(Mat4.translation(...this.thrust.times(-meters_per_frame)));
             this.inverse().pre_multiply(Mat4.translation(...this.thrust.times(+meters_per_frame)));
@@ -1029,6 +1030,9 @@ const Movement_Controls = defs.Movement_Controls =
             // Log some values:
             this.pos = this.inverse().times(vec4(0, 0, 0, 1));
             this.z_axis = this.inverse().times(vec4(0, 0, 1, 0));
+
+            defs.canvas_mouse_pos = this.mouse.from_center;
+            defs.pos = this.pos;
         }
     }
 
