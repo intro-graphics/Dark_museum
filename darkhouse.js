@@ -51,36 +51,36 @@ export class DarkHouse_Base extends Scene {
         // TODO: set better wall material
         this.materials = {
             wall_material: new Material(new defs.Phong_Shader(),
-                { ambient: 0, diffusivity: 1, color: hex_color("#ffffff") }),
+                { ambient: 0.1, diffusivity: 1, color: hex_color("#ffffff") }),
 
 
             texture_box: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/rubiks-cube.png")
             }),
 
             texture_sphere: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/earth.gif")
             }),
 
             texture_minecraft: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/minecraft.jpg")
             }),
 
             texture_woodbox: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/woodbox.jpg")
             }),
 
             texture_UFO: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/UFO.jpg")
             }),
 
@@ -88,13 +88,13 @@ export class DarkHouse_Base extends Scene {
             //museum floor/wall texture
             texture_floor: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/floor.jpeg")
             }),
 
             texture_wall: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/marble.jpg")
             }),
 
@@ -102,103 +102,103 @@ export class DarkHouse_Base extends Scene {
             //painting textures
             texture_painting1: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/starrynight.jpg")
             }),
             texture_painting2: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/monalisa.jpg")
             }),
 
             texture_painting3: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/monet1.jpg")
             }),
 
             texture_painting4: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/irises.jpg")
             }),
 
             texture_painting5: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/the-scream.jpg")
             }),
 
             texture_painting6: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/chineselandscape.jpg")
             }),
 
             texture_painting7: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/pearlearring.jpeg")
             }),
 
             texture_painting8: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/memory.JPG")
             }),
 
             texture_painting9: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/convergence.jpg")
             }),
 
             texture_painting10: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/composition.jpg")
             }),
 
             //statue and figures textures
             texture_pedestal: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/pedestal.jpg")
             }),
 
             texture_statue: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/thinker_diffuse.jpg")
             }),
 
             texture_vase: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/china.jpg")
             }),
 
             texture_bull: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/13927_Charging_Bull_Statue_of_Wall_Street_diff.jpg")
             }),
 
             texture_bench: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/burrimaro.jpg")
             }),
 
-            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 0, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
+            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 0.1, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
             
-            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 0, diffusivity: 1, specularity: 0.5, color: hex_color("#0398FC")}),
+            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 0.1, diffusivity: 1, specularity: 0.5, color: hex_color("#0398FC")}),
             
-            torus_material: new Material(new defs.Phong_Shader(), {ambient: 0, diffusivity: 1, specularity: 0.5, color: hex_color("#FCBA03")}),
+            torus_material: new Material(new defs.Phong_Shader(), {ambient: 0.1, diffusivity: 1, specularity: 0.5, color: hex_color("#FCBA03")}),
             
             cow_material: new Material(new defs.Fake_Bump_Map(1), {
                 color: color(.5, .5, .5, 1),
-                ambient: 0, diffusivity: 1, specularity: 1, texture: new Texture("assets/spot_texture.png")
+                ambient: 0.1, diffusivity: 1, specularity: 1, texture: new Texture("assets/spot_texture.png")
             }),
 
             start_background: new Material(new Phong_Shader(), {
