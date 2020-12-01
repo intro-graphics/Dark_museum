@@ -570,7 +570,7 @@ const Funny_Shader = defs.Funny_Shader =
 
 const Phong_Shader = defs.Phong_Shader =
     class Phong_Shader extends Shader {
-        // **Phong_Shader** is a subclass of Shader, which stores and maanges a GPU program.
+        // **Phong_Shader** is a subclass of Shader, which stores and manages a GPU program.
         // Graphic cards prior to year 2000 had shaders like this one hard-coded into them
         // instead of customizable shaders.  "Phong-Blinn" Shading here is a process of
         // determining brightness of pixels via vector math.  It compares the normal vector
@@ -590,7 +590,8 @@ const Phong_Shader = defs.Phong_Shader =
                 uniform vec4 light_positions_or_vectors[N_LIGHTS], light_colors[N_LIGHTS];
                 uniform float light_attenuation_factors[N_LIGHTS];
                 uniform vec4 shape_color;
-                uniform vec3 squared_scale, camera_center;
+                uniform vec3 squared_scale, camera_center, camera_direction;
+                float u_limit = 0.95;
         
                 // Specifier "varying" means a variable's final value will be passed from the vertex shader
                 // on to the next phase (fragment shader), then interpolated per-fragment, weighted by the
@@ -611,7 +612,12 @@ const Phong_Shader = defs.Phong_Shader =
                         vec3 surface_to_light_vector = light_positions_or_vectors[i].xyz - 
                                                        light_positions_or_vectors[i].w * vertex_worldspace;                                             
                         float distance_to_light = length( surface_to_light_vector );
-        
+                        
+                        vec3 surfaceToLightDirection = normalize(surface_to_light_vector);
+                        vec3 u_lightDirection = normalize(camera_direction);
+                        float dotFromDirection = dot(surfaceToLightDirection,
+                               u_lightDirection);
+            
                         vec3 L = normalize( surface_to_light_vector );
                         vec3 H = normalize( L + E );
                         // Compute the diffuse and specular components from the Phong
@@ -622,7 +628,12 @@ const Phong_Shader = defs.Phong_Shader =
                         
                         vec3 light_contribution = shape_color.xyz * light_colors[i].xyz * diffusivity * diffuse
                                                                   + light_colors[i].xyz * specularity * specular;
+                        if (dotFromDirection < u_limit) {
+                            attenuation = 0.0;
+                        }
+                        
                         result += attenuation * light_contribution;
+                        
                       }
                     return result;
                   } `;
@@ -670,9 +681,27 @@ const Phong_Shader = defs.Phong_Shader =
         }
 
         send_gpu_state(gl, gpu, gpu_state, model_transform) {
+
             // send_gpu_state():  Send the state of our whole drawing context to the GPU.
             const O = vec4(0, 0, 0, 1), camera_center = gpu_state.camera_transform.times(O).to3();
             gl.uniform3fv(gpu.camera_center, camera_center);
+
+            // const yz_switch = new Mat4(
+            // [1, 0, 0, 0],
+            // [0, 0, 1, 0],
+            // [0, 1, 0, 0],
+            // [0, 0, 0, 1]);
+            // send the eye vector to the GPU.
+            const E = vec4(0, 0, 1, 0), inverse_camera_direction = gpu_state.camera_transform.times(E).to3()
+            // const camera_direction = Mat4.translation(camera_center[0], camera_center[1], camera_center[2])
+            //     .times(yz_switch
+            //         .times(Mat4.translation(-camera_center[0], -camera_center[1], -camera_center[2])
+            //             .times(inverse_camera_direction))).to3();
+
+            // console.log(camera_direction)
+            gl.uniform3fv(gpu.camera_direction, inverse_camera_direction);
+
+
             // Use the squared scale trick from "Eric's blog" instead of inverse transpose matrix:
             const squared_scale = model_transform.reduce(
                 (acc, r) => {

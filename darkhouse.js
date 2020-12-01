@@ -46,63 +46,64 @@ export class DarkHouse_Base extends Scene {
         // TODO: set better wall material
         this.materials = {
             wall_material: new Material(new defs.Phong_Shader(),
-                { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
+
+                { ambient: 0, diffusivity: .6, color: hex_color("#ffffff") }),
             
             texture_wall: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: .5, diffusivity: 0.1, specularity: 0.1,
+                ambient: 0, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/brick-wall.jpg")
             }),
 
             texture_box: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: .5, diffusivity: 0.1, specularity: 0.1,
+                ambient: 0, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/rubiks-cube.png")
             }),
 
             texture_sphere: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                ambient: 0, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/earth.gif")
             }),
 
             texture_minecraft: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                ambient: 0, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/minecraft.jpg")
             }),
 
             texture_woodbox: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                ambient: 0, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/woodbox.jpg")
             }),
 
             texture_UFO: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: .3, diffusivity: 0.1, specularity: 0.1,
+                ambient: 0, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/UFO.jpg")
             }),
 
-            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
+            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 0, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
             
-            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#0398FC")}),
+            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 0, diffusivity: 1, specularity: 0.5, color: hex_color("#0398FC")}),
             
-            torus_material: new Material(new defs.Phong_Shader(), {ambient: 1, diffusivity: 1, specularity: 0.5, color: hex_color("#FCBA03")}),
+            torus_material: new Material(new defs.Phong_Shader(), {ambient: 0, diffusivity: 1, specularity: 0.5, color: hex_color("#FCBA03")}),
             
             cow_material: new Material(new defs.Fake_Bump_Map(1), {
                 color: color(.5, .5, .5, 1),
-                ambient: 0.5, diffusivity: 1, specularity: 1, texture: new Texture("assets/spot_texture.png")
+                ambient: 0, diffusivity: 1, specularity: 1, texture: new Texture("assets/spot_texture.png")
             }),
 
             start_background: new Material(new Phong_Shader(), {
-                color: color(0.5, 0.5, 0.5, 1), ambient: 0,
+                color: color(0, 0.5, 0.5, 1), ambient: 0,
                 diffusivity: 0, specularity: 0, smoothness: 20
             }),
 
             time_background: new Material(new Phong_Shader(), {
                 color: color(161, 31, 31, 1), ambient: 0,
-                diffusivity: 0.5, specularity: 0.3, smoothness: 50
+                diffusivity: 0, specularity: 0.3, smoothness: 50
             }),
 
             // To show text you need a Material like this one:
@@ -131,6 +132,11 @@ export class DarkHouse_Base extends Scene {
         // Reinstantiate background music audio file to it can start from the beginning
         this.background_music = new Audio('background_song.mp3');
         this.musicStarted = false;
+    }
+
+    get_eye_location(program_state) {
+        const O = vec4(0, 0, 0, 1), camera_center = program_state.camera_transform.times(O);
+        return camera_center;
     }
 
     // Setup Game Controls
@@ -170,7 +176,13 @@ export class DarkHouse_Base extends Scene {
         this.new_line(); this.new_line();
 
         // Add buttons so the user can actively toggle camera positions
+
         this.key_triggered_button("Return To Initial Position", ["Control", "o"], () => this.attached = () => this.initial_camera_location);
+    }
+
+    attach_light_to_camera(program_state) {
+            const light_position = this.get_eye_location(program_state);
+            program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
     }
 
     // Called once per frame of animation
@@ -194,6 +206,10 @@ export class DarkHouse_Base extends Scene {
 
         // Keep track of program time
         const t = this.t = program_state.animation_time / 1000;
+
+
+        // *** Lights: *** Values of vector or point lights.
+        this.attach_light_to_camera(program_state);
     }
 }
 
