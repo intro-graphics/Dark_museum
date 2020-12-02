@@ -570,7 +570,7 @@ const Funny_Shader = defs.Funny_Shader =
 
 const Phong_Shader = defs.Phong_Shader =
     class Phong_Shader extends Shader {
-        // **Phong_Shader** is a subclass of Shader, which stores and maanges a GPU program.
+        // **Phong_Shader** is a subclass of Shader, which stores and manages a GPU program.
         // Graphic cards prior to year 2000 had shaders like this one hard-coded into them
         // instead of customizable shaders.  "Phong-Blinn" Shading here is a process of
         // determining brightness of pixels via vector math.  It compares the normal vector
@@ -590,7 +590,8 @@ const Phong_Shader = defs.Phong_Shader =
                 uniform vec4 light_positions_or_vectors[N_LIGHTS], light_colors[N_LIGHTS];
                 uniform float light_attenuation_factors[N_LIGHTS];
                 uniform vec4 shape_color;
-                uniform vec3 squared_scale, camera_center;
+                uniform vec3 squared_scale, camera_center, camera_direction;
+                float u_limit = 0.95;
         
                 // Specifier "varying" means a variable's final value will be passed from the vertex shader
                 // on to the next phase (fragment shader), then interpolated per-fragment, weighted by the
@@ -611,7 +612,12 @@ const Phong_Shader = defs.Phong_Shader =
                         vec3 surface_to_light_vector = light_positions_or_vectors[i].xyz - 
                                                        light_positions_or_vectors[i].w * vertex_worldspace;                                             
                         float distance_to_light = length( surface_to_light_vector );
-        
+                        
+                        vec3 surfaceToLightDirection = normalize(surface_to_light_vector);
+                        vec3 u_lightDirection = normalize(camera_direction);
+                        float dotFromDirection = dot(surfaceToLightDirection,
+                               -u_lightDirection);
+            
                         vec3 L = normalize( surface_to_light_vector );
                         vec3 H = normalize( L + E );
                         // Compute the diffuse and specular components from the Phong
@@ -622,7 +628,12 @@ const Phong_Shader = defs.Phong_Shader =
                         
                         vec3 light_contribution = shape_color.xyz * light_colors[i].xyz * diffusivity * diffuse
                                                                   + light_colors[i].xyz * specularity * specular;
+                        if (dotFromDirection < u_limit) {
+                            attenuation = 0.0;
+                        }
+                        
                         result += attenuation * light_contribution;
+                        
                       }
                     return result;
                   } `;
@@ -670,9 +681,19 @@ const Phong_Shader = defs.Phong_Shader =
         }
 
         send_gpu_state(gl, gpu, gpu_state, model_transform) {
+
             // send_gpu_state():  Send the state of our whole drawing context to the GPU.
             const O = vec4(0, 0, 0, 1), camera_center = gpu_state.camera_transform.times(O).to3();
             gl.uniform3fv(gpu.camera_center, camera_center);
+
+
+            // send the eye vector to the GPU.
+            const E = vec4(0, 0, -1, 0), inverse_camera_direction = gpu_state.camera_transform.times(E).to3()
+
+            // console.log(camera_direction)
+            gl.uniform3fv(gpu.camera_direction, inverse_camera_direction);
+
+
             // Use the squared scale trick from "Eric's blog" instead of inverse transpose matrix:
             const squared_scale = model_transform.reduce(
                 (acc, r) => {
@@ -824,8 +845,23 @@ const Movement_Controls = defs.Movement_Controls =
             // Define bounds of the room
             this.bounds = 16;
 
+            //Define bounds of objects
+            this.objbounds = {
+                obj1: {x1: 0, x2: -3, y1: 0, y2: -3}, //rubix cube
+                obj2: {x1: 5, x2: 2, y1: 5, y2: 2}, //globe
+                obj3: {x1: 3, x2: 1, y1: 3, y2: 0}, //cow
+                obj4: {x1: 6, x2: 3, y1: -6, y2: -3}, //sphere
+                obj5: {x1: 12, x2: 9, y1: -10, y2: -13} //box
+            }
+
+
             this.mouse_enabled_canvases = new Set();
             this.will_take_over_graphics_state = true;
+
+            this.left = false;
+            this.right = false;
+            this.forward = false;
+            this.backward = false;
         }
 
         set_recipient(matrix_closure, inverse_closure) {
@@ -885,29 +921,34 @@ const Movement_Controls = defs.Movement_Controls =
             this.live_string(box => box.textContent = "Player movement");
             this.new_line(); this.new_line();
             this.key_triggered_button("Forward", ["w"], () => {
-                if (this.pos[2] < this.bounds)
-                    this.thrust[2] = 1;
-                else
-                    this.thrust[2] = 0;
-            }, undefined, () => this.thrust[2] = 0);
+                this.forward = true;
+                this.thrust[2] = 1;
+            }, undefined, () => {
+                this.forward = false;    
+                this.thrust[2] = 0;
+                
+            });
             this.key_triggered_button("Left", ["a"], () => {
-                if (this.pos[0] < this.bounds)
-                    this.thrust[0] = 1;
-                else
-                    this.thrust[0] = 0;
-            }, undefined, () => this.thrust[0] = 0);
+                this.left = true;
+                this.thrust[0] = 1;
+            }, undefined, () => {
+                this.left = false;
+                this.thrust[0] = 0
+            });
             this.key_triggered_button("Back", ["s"], () => {
-                if (this.pos[2] > -this.bounds)
-                    this.thrust[2] = -1;
-                else
-                    this.thrust[2] = 0;
-            }, undefined, () => this.thrust[2] = 0);
+                this.backward = true;
+                this.thrust[2] = -1;
+            }, undefined, () => {
+                this.backward = false;
+                this.thrust[2] = 0
+            });
             this.key_triggered_button("Right", ["d"], () => {
-                if (this.pos[0] > -this.bounds)
-                    this.thrust[0] = -1;
-                else
-                    this.thrust[0] = 0;
-            }, undefined, () => this.thrust[0] = 0);
+                this.right = true;
+                this.thrust[0] = -1;
+            }, undefined, () => {
+                this.right = false;
+                this.thrust[0] = 0
+            });
             this.new_line(); this.new_line();
 
             this.live_string(box => box.textContent = "Camera movement");
@@ -981,6 +1022,7 @@ const Movement_Controls = defs.Movement_Controls =
 
         display(context, graphics_state, dt = graphics_state.animation_delta_time / 1000) {
             // The whole process of acting upon controls begins here.
+
             const m = this.speed_multiplier * this.meters_per_frame,
                 r = this.speed_multiplier * this.radians_per_frame;
 
@@ -993,6 +1035,28 @@ const Movement_Controls = defs.Movement_Controls =
                 this.add_mouse_controls(context.canvas);
                 this.mouse_enabled_canvases.add(context.canvas)
             }
+    
+            //detect bounds
+            if (this.pos[0] > this.bounds && this.left)
+                this.thrust[0] = -0.1;
+            else if(this.pos[0] < -this.bounds && this.right) 
+                this.thrust[0] = 0.1;
+
+            if(this.pos[2] > this.bounds && this.forward)
+                this.thrust[2] = -0.1;
+            else if(this.pos[2] < -this.bounds && this.backward)
+                this.thrust[2] = 0.1;
+
+            // Variables required for darkhouse.js
+            defs.forward = this.forward;
+            defs.backward = this.backward;
+            defs.left = this.left;
+            defs.right = this.right;
+
+            defs.canvas_mouse_pos = this.mouse.from_center;
+            defs.pos = this.pos;
+            defs.thrust = this.thrust;
+            
             // Move in first-person.  Scale the normal camera aiming speed by dt for smoothness:
             this.first_person_flyaround(dt * r, dt * m);
             // Also apply third-person "arcball" camera mode if a mouse drag is occurring:
@@ -1001,9 +1065,6 @@ const Movement_Controls = defs.Movement_Controls =
             // Log some values:
             this.pos = this.inverse().times(vec4(0, 0, 0, 1));
             this.z_axis = this.inverse().times(vec4(0, 0, 1, 0));
-
-            defs.canvas_mouse_pos = this.mouse.from_center;
-            defs.pos = this.pos;
         }
     }
 

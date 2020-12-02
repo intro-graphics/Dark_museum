@@ -3,6 +3,7 @@ import {defs, tiny} from './examples/common.js';
 // Import Darkhouse
 import {DarkHouse} from "./darkhouse.js";
 import {Obj_File_Demo} from "./examples/obj-file-demo.js";
+import {Collision_Demo, Inertia_Demo} from "./examples/collisions-demo.js";
 
 // Pull these names into this module's scope for convenience:
 const {
@@ -19,13 +20,16 @@ const {
 //                      as common.js into one file for you, such as "dependencies.js")
 
 Object.assign(defs,
-            {DarkHouse});
+    {DarkHouse},
+    {Obj_File_Demo},
+    {Collision_Demo},
+    {Inertia_Demo});
 
 // ******************** End extra step
 
 // (Can define Main_Scene's class here)
 
-const Main_Scene = DarkHouse;
+const Main_Scene =  DarkHouse;
 const Additional_Scenes = [];
 
 export {Main_Scene, Additional_Scenes, Canvas_Widget, Code_Widget, Text_Widget, defs}

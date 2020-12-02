@@ -32,6 +32,13 @@ export class DarkHouse_Base extends Scene {
         // Tracking music state
         this.musicStarted = false;
 
+        this.torus_speed = -2;
+        this.torus_y = 0;
+        
+        // For Total object Count;
+        this.centers = new Array(6).fill(0);
+        this.short_bounce = false;
+
         // Models
         this.shapes = {
             wall: new Square(),
@@ -48,33 +55,39 @@ export class DarkHouse_Base extends Scene {
             text: new Text_Line(35)
         };
 
+        // For Colliders
+        this.colliders = [
+            {intersect_test: this.intersect_sphere, points: new defs.Subdivision_Sphere(1), leeway: .5},
+            {intersect_test: this.intersect_sphere, points: new defs.Subdivision_Sphere(2), leeway: .3},
+            {intersect_test: this.intersect_cube, points: new defs.Cube(), leeway: .1}
+        ];
+
         // TODO: set better wall material
         this.materials = {
             wall_material: new Material(new defs.Phong_Shader(),
-                { ambient: 0.1, diffusivity: 1, color: hex_color("#ffffff") }),
-
+                { ambient: 0.1, diffusivity: 0.9, color: hex_color("#ffffff") }),
 
             texture_box: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0.1, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/rubiks-cube.png")
             }),
 
             texture_sphere: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0.1, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/earth.gif")
             }),
 
             texture_minecraft: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0.1, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/minecraft.jpg")
             }),
 
             texture_woodbox: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0.1, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/woodbox.jpg")
             }),
 
@@ -83,7 +96,6 @@ export class DarkHouse_Base extends Scene {
                 ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/UFO.jpg")
             }),
-
 
             //museum floor/wall texture
             texture_floor: new Material(new Textured_Phong(), {
@@ -98,16 +110,16 @@ export class DarkHouse_Base extends Scene {
                 texture: new Texture("assets/marble.jpg")
             }),
 
-
             //painting textures
             texture_painting1: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
                 ambient: 0.1, diffusivity: 1, specularity: 0.1,
                 texture: new Texture("assets/starrynight.jpg")
             }),
+
             texture_painting2: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0.1, diffusivity: 1, specularity: 0.1,
+                ambient: 0.1, diffusivity: 0.5, specularity: 0.1,
                 texture: new Texture("assets/monalisa.jpg")
             }),
 
@@ -190,11 +202,14 @@ export class DarkHouse_Base extends Scene {
                 texture: new Texture("assets/burrimaro.jpg")
             }),
 
-            sphere_material: new Material(new defs.Phong_Shader(), {ambient: 0.1, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
+            sphere_material: new Material(new defs.Phong_Shader(), 
+                {ambient: 0.1, diffusivity: 1, specularity: 0.5, color: hex_color("#252F2F")}),
             
-            cube_material:  new Material(new defs.Phong_Shader(), {ambient: 0.1, diffusivity: 1, specularity: 0.5, color: hex_color("#0398FC")}),
+            cube_material:  new Material(new defs.Phong_Shader(), 
+                {ambient: 0.1, diffusivity: 1, specularity: 0.5, color: hex_color("#0398FC")}),
             
-            torus_material: new Material(new defs.Phong_Shader(), {ambient: 0.1, diffusivity: 1, specularity: 0.5, color: hex_color("#FCBA03")}),
+            torus_material: new Material(new defs.Phong_Shader(), 
+                {ambient: 0.1, diffusivity: 1, specularity: 0.5, color: hex_color("#FCBA03")}),
             
             cow_material: new Material(new defs.Fake_Bump_Map(1), {
                 color: color(.5, .5, .5, 1),
@@ -202,13 +217,13 @@ export class DarkHouse_Base extends Scene {
             }),
 
             start_background: new Material(new Phong_Shader(), {
-                color: color(0.5, 0.5, 0.5, 1), ambient: 0,
+                color: color(0, 0.5, 0.5, 1), ambient: 0,
                 diffusivity: 0, specularity: 0, smoothness: 20
             }),
 
             time_background: new Material(new Phong_Shader(), {
                 color: color(161, 31, 31, 1), ambient: 0,
-                diffusivity: 0.5, specularity: 0.3, smoothness: 50
+                diffusivity: 0, specularity: 0.3, smoothness: 50
             }),
 
             // To show text you need a Material like this one:
@@ -237,6 +252,11 @@ export class DarkHouse_Base extends Scene {
         // Reinstantiate background music audio file to it can start from the beginning
         this.background_music = new Audio('background_song.mp3');
         this.musicStarted = false;
+    }
+
+    get_eye_location(program_state) {
+        const O = vec4(0, 0, 0, 1), camera_center = program_state.camera_transform.times(O);
+        return camera_center;
     }
 
     // Setup Game Controls
@@ -276,7 +296,13 @@ export class DarkHouse_Base extends Scene {
         this.new_line(); this.new_line();
 
         // Add buttons so the user can actively toggle camera positions
+
         this.key_triggered_button("Return To Initial Position", ["Control", "o"], () => this.attached = () => this.initial_camera_location);
+    }
+
+    attach_light_to_camera(program_state) {
+            const light_position = this.get_eye_location(program_state);
+            program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
     }
 
     // Called once per frame of animation
@@ -300,17 +326,15 @@ export class DarkHouse_Base extends Scene {
 
         // Keep track of program time
         const t = this.t = program_state.animation_time / 1000;
+
+
+        // *** Lights: *** Values of vector or point lights.
+        this.attach_light_to_camera(program_state);
     }
 }
 
-
 export class DarkHouse extends DarkHouse_Base {
-    // Ensure that light position is equal to camera position
-    attach_light_to_camera(program_state) {
-        const light_position = vec4.apply(null, program_state.camera_transform.transposed()[3]);
-        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1)];
-    }
-    
+
     // Create Objects 
     createObjectsInRoom(context, program_state, model_transform) {
         const t = program_state.animation_time / 1000;
@@ -346,6 +370,28 @@ export class DarkHouse extends DarkHouse_Base {
         let bench1_model_transform = model_transform.times(Mat4.translation(0, -4, 1.5)).times(Mat4.scale(3, 3, 2));
         let bench2_model_transform = model_transform.times(Mat4.translation(0, 4, 1.5)).times(Mat4.scale(3, 3, 2));
 
+        // console.log(torus_model_transform.transposed());
+        // const [torus_x, torus_y, torus_z] = torus_model_transform.transposed()[3];
+        // // this.torus_y = torus_y;
+        // if(torus_y <= -18)
+        //     this.torus_speed = 2;
+
+        this.centers[0] = sphere_model_transform.transposed()[3];
+        //this.centers[1] = sphere2_model_transform.transposed()[3];
+        this.centers[1] = cube_model_transform.transposed()[3];
+        //this.centers[3] = cube2_model_transform.transposed()[3];
+        //this.centers[4] = torus_model_transform.transposed()[3];
+        this.centers[2] = cow_model_transform.transposed()[3];
+        
+        this.distances = this.centers.map((pos) => {
+            return Math.sqrt(
+                (defs.pos[0] - pos[1]) ** 2 +
+                (defs.pos[2] - pos[0]) ** 2
+            );
+        });
+
+        this.detect_Collision(this.distances, 1);
+
         this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.texture_sphere);
         //this.shapes.object2.draw(context, program_state, sphere2_model_transform, this.materials.texture_minecraft);
 
@@ -376,6 +422,29 @@ export class DarkHouse extends DarkHouse_Base {
         this.shapes.bull.draw(context, program_state, bull_model_transform, this.materials.texture_bull);
         this.shapes.bench.draw(context, program_state, bench1_model_transform, this.materials.texture_bench);
         this.shapes.bench.draw(context, program_state, bench2_model_transform, this.materials.texture_bench);
+    }
+
+    // Detect Collision and Give a small feedback
+    detect_Collision(distances, margin){
+        var collide = distances.some((dist) => dist < margin);
+        if (collide){
+            if(defs.left){
+                defs.thrust[0] = -0.3;
+            }else if(defs.right){
+                defs.thrust[0] = 0.3;
+            }
+
+            if(defs.forward){
+                defs.thrust[2] = -0.3;
+            }else if(defs.backward){
+                defs.thrust[2] = 0.3;
+            }
+            this.short_bounce = true;
+        }else if(this.short_bounce){
+            defs.thrust[0] = 0;
+            defs.thrust[2] = 0;
+            this.short_bounce = false;
+        }
     }
 
     // Helper method to create room
@@ -498,24 +567,24 @@ export class DarkHouse extends DarkHouse_Base {
         else if ((this.allObjectsFound) && (this.currentGameTime <= 0)) {
             this.victory = false;
         }
-        // If time has run out
-        else if (this.currentGameTime <= 0) {
-            this.endGame = true;
-            this.victory = false;
+        // If time has run out	
+        else if (this.currentGameTime <= 0) {	
+            this.endGame = true;	
+            this.victory = false;	
         }
     }
 
-    // Set game counter to 60 seconds
-    updateGameTime(program_state) {
-        // Initially, set timer to 60s
-        if (!this.timeUpdated) {
-            this.currentGameTime = this.gameDuration;
-            this.timeUpdated = true;
-        } 
-        // Once timer is set, decrement the relative change in time per frame from initial time
-        else {
-            this.currentGameTime = this.currentGameTime - (program_state.animation_delta_time/1000);
-        }
+    // Set game counter to 60 seconds	
+    updateGameTime(program_state) {	
+        // Initially, set timer to 60s	
+        if (!this.timeUpdated) {	
+            this.currentGameTime = this.gameDuration;	
+            this.timeUpdated = true;	
+        } 	
+        // Once timer is set, decrement the relative change in time per frame from initial time	
+        else {	
+            this.currentGameTime = this.currentGameTime - (program_state.animation_delta_time/1000);	
+        }	
     }
 
     // Display time remaining on top
@@ -559,7 +628,7 @@ export class DarkHouse extends DarkHouse_Base {
                     // Initialize game time / update current game time
                     this.updateGameTime(program_state);
                     // Attach light to camera
-                    this.attach_light_to_camera(program_state);
+                    // this.attach_light_to_camera(program_state);
                     // Create main room object
                     this.createRoom(context, program_state, model_transform);
                     // Create objects in the room
