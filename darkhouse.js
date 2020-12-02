@@ -32,6 +32,13 @@ export class DarkHouse_Base extends Scene {
         // Tracking music state
         this.musicStarted = false;
 
+        this.torus_speed = -2;
+        this.torus_y = 0;
+        
+        // For Total object Count;
+        this.centers = new Array(6).fill(0);
+        this.short_bounce = false;
+
         // Models
         this.shapes = {
             wall: new Square(),
@@ -42,6 +49,13 @@ export class DarkHouse_Base extends Scene {
             cow: new Shape_From_File("assets/spot_triangulated.obj"),
             text: new Text_Line(35)
         };
+
+        // For Colliders
+        this.colliders = [
+            {intersect_test: this.intersect_sphere, points: new defs.Subdivision_Sphere(1), leeway: .5},
+            {intersect_test: this.intersect_sphere, points: new defs.Subdivision_Sphere(2), leeway: .3},
+            {intersect_test: this.intersect_cube, points: new defs.Cube(), leeway: .1}
+        ];
 
         // TODO: set better wall material
         this.materials = {
@@ -213,7 +227,6 @@ export class DarkHouse_Base extends Scene {
     }
 }
 
-
 export class DarkHouse extends DarkHouse_Base {
 
     
@@ -227,8 +240,32 @@ export class DarkHouse extends DarkHouse_Base {
         let cube_model_transform = model_transform.times(Mat4.translation(0, 0, 1));
         let cube2_model_transform = model_transform.times(Mat4.translation(12, -10, 1));
 
-        let torus_model_transform = model_transform.times(Mat4.translation(-5, -5, 2)).times(Mat4.scale(2.5, 2.5, 2));
+        let torus_model_transform = model_transform
+            .times(Mat4.translation(-10 * Math.sin(this.torus_speed * t / 2 ), -18 * Math.sin(this.torus_speed * t / 2 ), 2))
+            .times(Mat4.scale(2.5, 2.5, 2));
         let cow_model_transform = model_transform.times(Mat4.translation(3, 3, 2)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
+
+        console.log(torus_model_transform.transposed());
+        const [torus_x, torus_y, torus_z] = torus_model_transform.transposed()[3];
+        // this.torus_y = torus_y;
+        if(torus_y <= -18)
+            this.torus_speed = 2;
+
+        this.centers[0] = sphere_model_transform.transposed()[3];
+        this.centers[1] = sphere2_model_transform.transposed()[3];
+        this.centers[2] = cube_model_transform.transposed()[3];
+        this.centers[3] = cube2_model_transform.transposed()[3];
+        this.centers[4] = torus_model_transform.transposed()[3];
+        this.centers[5] = cow_model_transform.transposed()[3];
+        
+        this.distances = this.centers.map((pos) => {
+            return Math.sqrt(
+                (defs.pos[0] - pos[1]) ** 2 +
+                (defs.pos[2] - pos[0]) ** 2
+            );
+        });
+
+        this.detect_Collision(this.distances, 1);
 
         this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.texture_sphere);
         this.shapes.object2.draw(context, program_state, sphere2_model_transform, this.materials.texture_minecraft);
@@ -238,6 +275,30 @@ export class DarkHouse extends DarkHouse_Base {
 
         this.shapes.torus.draw(context, program_state, torus_model_transform, this.materials.texture_UFO);
         this.shapes.cow.draw(context, program_state, cow_model_transform, this.materials.cow_material);
+
+    }
+
+    // Detect Collision and Give a small feedback
+    detect_Collision(distances, margin){
+        var collide = distances.some((dist) => dist < margin);
+        if (collide){
+            if(defs.left){
+                defs.thrust[0] = -0.3;
+            }else if(defs.right){
+                defs.thrust[0] = 0.3;
+            }
+
+            if(defs.forward){
+                defs.thrust[2] = -0.3;
+            }else if(defs.backward){
+                defs.thrust[2] = 0.3;
+            }
+            this.short_bounce = true;
+        }else if(this.short_bounce){
+            defs.thrust[0] = 0;
+            defs.thrust[2] = 0;
+            this.short_bounce = false;
+        }
     }
 
     // Helper method to create room
@@ -360,24 +421,24 @@ export class DarkHouse extends DarkHouse_Base {
         else if ((this.allObjectsFound) && (this.currentGameTime <= 0)) {
             this.victory = false;
         }
-        // If time has run out
-        else if (this.currentGameTime <= 0) {
-            this.endGame = true;
-            this.victory = false;
+        // If time has run out	
+        else if (this.currentGameTime <= 0) {	
+            this.endGame = true;	
+            this.victory = false;	
         }
     }
 
-    // Set game counter to 60 seconds
-    updateGameTime(program_state) {
-        // Initially, set timer to 60s
-        if (!this.timeUpdated) {
-            this.currentGameTime = this.gameDuration;
-            this.timeUpdated = true;
-        } 
-        // Once timer is set, decrement the relative change in time per frame from initial time
-        else {
-            this.currentGameTime = this.currentGameTime - (program_state.animation_delta_time/1000);
-        }
+    // Set game counter to 60 seconds	
+    updateGameTime(program_state) {	
+        // Initially, set timer to 60s	
+        if (!this.timeUpdated) {	
+            this.currentGameTime = this.gameDuration;	
+            this.timeUpdated = true;	
+        } 	
+        // Once timer is set, decrement the relative change in time per frame from initial time	
+        else {	
+            this.currentGameTime = this.currentGameTime - (program_state.animation_delta_time/1000);	
+        }	
     }
 
     // Display time remaining on top
