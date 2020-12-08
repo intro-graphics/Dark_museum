@@ -370,12 +370,12 @@ export class DarkHouse extends DarkHouse_Base {
         // Center position for each object and its x, y dimension.
         // Center position, x, y
         this.centers[0] = [...cow_model_transform.transposed()[3], 1, 2];
-        this.centers[1] = [...pedestal_model_transform.transposed()[3], 1, 2];
+        this.centers[1] = [...pedestal_model_transform.transposed()[3], 1.5, 1.5];
         this.centers[2] = [...statue_model_transform.transposed()[3], 1, 2];
         this.centers[3] = [...vase_model_transform.transposed()[3], 1, 4];
         this.centers[4] = [...bull_model_transform.transposed()[3], 4, 2];
         this.centers[5] = [...bench1_model_transform.transposed()[3], 1.5, 5];
-        this.centers[6] = [...bench2_model_transform.transposed()[3], 1, 2];
+        this.centers[6] = [...bench2_model_transform.transposed()[3], 1.5, 5];
 
         this.distances = this.centers.map((pos) => {
             return [
