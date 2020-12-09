@@ -62,6 +62,17 @@ export class DarkHouse_Base extends Scene {
       { intersect_test: this.intersect_cube, points: new defs.Cube(), leeway: .1 }
     ];
 
+    //For Objects Found Dictionary
+    this.object_found = {
+      "Objects List" : true,
+      "Toy cow": true,
+      "Vase": true,
+      "Thinker": false,
+      "Rubix cube": false,
+      "Globe": false,
+      "Charging bull": false
+    }
+
     // TODO: set better wall material
     this.materials = {
       wall_material: new Material(new defs.Phong_Shader(),
@@ -590,16 +601,16 @@ export class DarkHouse extends DarkHouse_Base {
     }
   }
 
-  // Display time remaining on top
-  showLiveTimeRemaining(context, program_state, model_transform) {
+  // Displays all live text: time remaining on top and objects found list on the side
+  showLiveText(context, program_state, model_transform) {
     // TODO: Need to move timestamp along with camera so it looks like it is in one place
 
     // Display current time remaining
     let strings = ['' + this.currentGameTime.toFixed(2) + 's'];
     const multi_line_string = strings[0].split("\n");
     let cube_side = model_transform.times(Mat4.translation(-3, 0.5, 5.5))
-      .times(Mat4.rotation(Math.PI / 2, 0, 0, -1))
-      .times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
+        .times(Mat4.rotation(Math.PI/2, 0, 0, -1))
+        .times(Mat4.rotation(Math.PI/2, 1, 0, 0));
 
     // Draw text
     for (let line of multi_line_string.slice(0, 30)) {
@@ -607,6 +618,31 @@ export class DarkHouse extends DarkHouse_Base {
       this.shapes.text.set_string(line, context.context);
       // Draw but scale down to fit box size
       this.shapes.text.draw(context, program_state, cube_side.times(Mat4.scale(.18, .18, .18)), this.materials.text_image);
+    }
+
+    var z_inc = 0;
+
+    for(var key in this.object_found) {
+
+      let obj_strings = ['' + key];
+      let text_color = color(1,0,0,1);
+
+      if (this.object_found[key] == true)
+        text_color = color(1,1,1,1);
+
+      const multi_line_string2 = obj_strings[0].split("\n");
+
+      cube_side = model_transform.times(Mat4.translation(-3, 5, 5.5 - z_inc))
+          .times(Mat4.rotation(Math.PI / 2, 0, 0, -1))
+          .times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
+
+      for (let line of multi_line_string2.slice(0, 30)) {
+        // Set the string using set_string
+        this.shapes.text.set_string(line, context.context);
+        // Draw but scale down to fit box size
+        this.shapes.text.draw(context, program_state, cube_side.times(Mat4.scale(.1, .1, .1)), this.materials.text_image.override({color: text_color}));
+      }
+      z_inc += 0.25;
     }
   }
 
@@ -627,7 +663,7 @@ export class DarkHouse extends DarkHouse_Base {
           // Get current game state
           this.getGameState();
           // Show live time remaining
-          this.showLiveTimeRemaining(context, program_state, model_transform);
+          this.showLiveText(context, program_state, model_transform);
           // Initialize game time / update current game time
           this.updateGameTime(program_state);
           // Attach light to camera
