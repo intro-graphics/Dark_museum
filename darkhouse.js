@@ -2,7 +2,7 @@ import { defs, tiny } from './examples/common.js';
 import { Shape_From_File } from './examples/obj-file-demo.js';
 // Pull these names into this module's scope for convenience:
 const { vec3, vec4, Vector, color, hex_color, Mat4, Light, Shape, Material, Shader, Texture, Scene } = tiny;
-const { Triangle, Square, Tetrahedron, Torus, Windmill, Cube, Subdivision_Sphere, Cylindrical_Tube, Textured_Phong, Phong_Shader } = defs;
+const { Triangle, Square, Tetrahedron, Torus, Windmill, Cube, Subdivision_Sphere, Cylindrical_Tube, Textured_Phong, Textured_Phong_text, Phong_Shader } = defs;
 
 // For writing game text
 import { Text_Line } from './text-line.js';
@@ -228,6 +228,12 @@ export class DarkHouse_Base extends Scene {
 
       // To show text you need a Material like this one:
       text_image: new Material(new Textured_Phong(1), {
+        ambient: 1, diffusivity: 0, specularity: 0,
+        texture: new Texture("assets/text.png")
+      }),
+
+      // to show text that is attached to the screen, use this:
+      text_image_screen: new Material(new Textured_Phong_text(1), {
         ambient: 1, diffusivity: 0, specularity: 0,
         texture: new Texture("assets/text.png")
       })
@@ -597,16 +603,16 @@ export class DarkHouse extends DarkHouse_Base {
     // Display current time remaining
     let strings = ['' + this.currentGameTime.toFixed(2) + 's'];
     const multi_line_string = strings[0].split("\n");
-    let cube_side = model_transform.times(Mat4.translation(-3, 0.5, 5.5))
-      .times(Mat4.rotation(Math.PI / 2, 0, 0, -1))
-      .times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
+    let cube_side = Mat4.identity()
+        .times(Mat4.scale(0.05,0.05,0.0))
+        .times(Mat4.translation(-3,18,0));
 
     // Draw text
     for (let line of multi_line_string.slice(0, 30)) {
       // Set the string using set_string
       this.shapes.text.set_string(line, context.context);
       // Draw but scale down to fit box size
-      this.shapes.text.draw(context, program_state, cube_side.times(Mat4.scale(.18, .18, .18)), this.materials.text_image);
+      this.shapes.text.draw(context, program_state, cube_side, this.materials.text_image_screen);
     }
   }
 
