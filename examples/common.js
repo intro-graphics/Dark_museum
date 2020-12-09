@@ -739,7 +739,6 @@ const Phong_Shader = defs.Phong_Shader =
         }
     }
 
-
 const Textured_Phong = defs.Textured_Phong =
     class Textured_Phong extends Phong_Shader {
         // **Textured_Phong** is a Phong Shader extended to addditionally decal a
@@ -799,6 +798,29 @@ const Textured_Phong = defs.Textured_Phong =
         }
     }
 
+const Textured_Phong_text = defs.Textured_Phong_text =
+    class Textured_Phong_text extends Textured_Phong {
+        vertex_glsl_code() {
+            return this.shared_glsl_code() + `
+                varying vec2 f_tex_coord;
+                attribute vec3 position, normal;                            
+                // Position is expressed in object coordinates.
+                attribute vec2 texture_coord;
+                
+                uniform mat4 model_transform;
+                uniform mat4 projection_camera_model_transform;
+        
+                void main(){                                                                   
+                    // The vertex's final resting place (in NDCS):
+                    gl_Position =  model_transform * vec4( position, 1.0 );
+                    // The final normal vector in screen space.
+                    N = normalize( mat3( model_transform ) * normal / squared_scale);
+                    vertex_worldspace = ( model_transform * vec4( position, 1.0 ) ).xyz;
+                    // Turn the per-vertex texture coordinate into an interpolated variable.
+                    f_tex_coord = texture_coord;
+                  } `;
+        }
+    }
 
 const Fake_Bump_Map = defs.Fake_Bump_Map =
     class Fake_Bump_Map extends Textured_Phong {
