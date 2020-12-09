@@ -47,29 +47,29 @@ export class DarkHouse_Base extends Scene {
         this.materials = {
             wall_material: new Material(new defs.Phong_Shader(),
 
-                { ambient: 0, diffusivity: 0.9, color: hex_color("#ffffff") }),
+                { ambient: 0.0, diffusivity: 0.9, color: hex_color("#ffffff") }),
             
             texture_wall: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 0.9, specularity: 0.1,
+                ambient: 0.0, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/brick-wall.jpg")
             }),
 
             texture_box: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 0.9, specularity: 0.1,
+                ambient: 0.2, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/rubiks-cube.png")
             }),
 
             texture_sphere: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 0.9, specularity: 0.1,
+                ambient: 0.2, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/earth.gif")
             }),
 
             texture_minecraft: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
-                ambient: 0, diffusivity: 0.9, specularity: 0.1,
+                ambient: 0.2, diffusivity: 0.9, specularity: 0.1,
                 texture: new Texture("assets/minecraft.jpg")
             }),
 
