@@ -36,7 +36,7 @@ export class DarkHouse_Base extends Scene {
         this.torus_y = 0;
         
         // For Total object Count;
-        this.centers = new Array(6).fill(0);
+        this.centers = new Array(7).fill(0);
         this.short_bounce = false;
 
         // Models
@@ -340,12 +340,9 @@ export class DarkHouse extends DarkHouse_Base {
         const t = program_state.animation_time / 1000;
 
         let sphere_model_transform = model_transform.times(Mat4.translation(-16, -10, 1)).times(Mat4.rotation(Math.PI/2, 1, 0, 0)).times(Mat4.rotation(Math.PI/2*t, 0, 1, 0));
-        //let sphere2_model_transform = model_transform.times(Mat4.translation(6, -6, 1));
 
         let cube_model_transform = model_transform.times(Mat4.translation(2, -4, 2)).times(Mat4.scale(0.25, 0.25, 0.25));
-        //let cube2_model_transform = model_transform.times(Mat4.translation(12, -10, 1));
 
-        //let torus_model_transform = model_transform.times(Mat4.translation(-5, -5, 2)).times(Mat4.scale(2.5, 2.5, 2));
         let cow_model_transform = model_transform.times(Mat4.translation(-3, 4, 2.6)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(0.7, 0.7, 0.7));
 
         //painting model transforms
@@ -370,24 +367,23 @@ export class DarkHouse extends DarkHouse_Base {
         let bench1_model_transform = model_transform.times(Mat4.translation(0, -4, 1.5)).times(Mat4.scale(3, 3, 2));
         let bench2_model_transform = model_transform.times(Mat4.translation(0, 4, 1.5)).times(Mat4.scale(3, 3, 2));
 
-        // console.log(torus_model_transform.transposed());
-        // const [torus_x, torus_y, torus_z] = torus_model_transform.transposed()[3];
-        // // this.torus_y = torus_y;
-        // if(torus_y <= -18)
-        //     this.torus_speed = 2;
+        // Center position for each object and its x, y dimension.
+        // Center position, x, y
+        this.centers[0] = [...cow_model_transform.transposed()[3], 1, 2];
+        this.centers[1] = [...pedestal_model_transform.transposed()[3], 1.5, 1.5];
+        this.centers[2] = [...statue_model_transform.transposed()[3], 1, 2];
+        this.centers[3] = [...vase_model_transform.transposed()[3], 1, 4];
+        this.centers[4] = [...bull_model_transform.transposed()[3], 4, 2];
+        this.centers[5] = [...bench1_model_transform.transposed()[3], 1.5, 5];
+        this.centers[6] = [...bench2_model_transform.transposed()[3], 1.5, 5];
 
-        this.centers[0] = sphere_model_transform.transposed()[3];
-        //this.centers[1] = sphere2_model_transform.transposed()[3];
-        this.centers[1] = cube_model_transform.transposed()[3];
-        //this.centers[3] = cube2_model_transform.transposed()[3];
-        //this.centers[4] = torus_model_transform.transposed()[3];
-        this.centers[2] = cow_model_transform.transposed()[3];
-        
         this.distances = this.centers.map((pos) => {
-            return Math.sqrt(
-                (defs.pos[0] - pos[1]) ** 2 +
-                (defs.pos[2] - pos[0]) ** 2
-            );
+            return [
+                Math.abs(defs.pos[0] - pos[1]),
+                Math.abs(defs.pos[2] - pos[0]),
+                pos[4],
+                pos[5]
+            ];
         });
 
         this.detect_Collision(this.distances, 1);
@@ -425,8 +421,10 @@ export class DarkHouse extends DarkHouse_Base {
     }
 
     // Detect Collision and Give a small feedback
-    detect_Collision(distances, margin){
-        var collide = distances.some((dist) => dist < margin);
+    detect_Collision(distances){
+        const collide = distances.some((dist) => {
+            return dist[0] < dist[2] && dist [1] < dist[3]
+        });
         if (collide){
             if(defs.left){
                 defs.thrust[0] = -0.3;
