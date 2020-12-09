@@ -36,7 +36,7 @@ export class DarkHouse_Base extends Scene {
     this.torus_y = 0;
 
     // For Total object Count;
-    this.centers = new Array(7).fill(0);
+    this.centers = new Array(9).fill(0);
     this.short_bounce = false;
 
     // Models
@@ -65,12 +65,22 @@ export class DarkHouse_Base extends Scene {
     //For Objects Found Dictionary
     this.object_found = {
       "Objects List" : true,
-      "Toy cow": true,
-      "Vase": true,
+      "Toy cow": false,
+      "Vase": false,      
       "Thinker": false,
       "Rubix cube": false,
       "Globe": false,
       "Charging bull": false
+    }
+
+    // Track index for objects
+    this.object_index = {
+      0: "Toy cow",
+      2: "Thinker",
+      3: "Vase",
+      4: "Charging bull",
+      7: "Globe",
+      8: "Rubix cube"
     }
 
     // TODO: set better wall material
@@ -251,6 +261,14 @@ export class DarkHouse_Base extends Scene {
 
   // Function to reset all game controls to initialized state
   reset() {
+    // Reset all objects found to false except Object List
+    for (var key in this.object_found) {
+      if (this.object_found.hasOwnProperty(key)) {
+          if (key != 'Objects List') { 
+            this.object_found[key] = false;
+          }
+      }
+    }
     this.startGame = false;
     this.pauseGame = false;
     this.endGame = false;
@@ -387,6 +405,8 @@ export class DarkHouse extends DarkHouse_Base {
     this.centers[4] = [...bull_model_transform.transposed()[3], 4, 2];
     this.centers[5] = [...bench1_model_transform.transposed()[3], 1.5, 5];
     this.centers[6] = [...bench2_model_transform.transposed()[3], 1.5, 5];
+    this.centers[7] = [...sphere_model_transform.transposed()[3], 2, 2];
+    this.centers[8] = [...cube_model_transform.transposed()[3], 2, 2];
 
     this.distances = this.centers.map((pos) => {
       return [
@@ -397,7 +417,7 @@ export class DarkHouse extends DarkHouse_Base {
       ];
     });
 
-    this.detect_Collision(this.distances, 1);
+    this.detect_Collision(context, program_state, this.distances, 1);
 
     this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.texture_sphere);
     //this.shapes.object2.draw(context, program_state, sphere2_model_transform, this.materials.texture_minecraft);
@@ -432,11 +452,26 @@ export class DarkHouse extends DarkHouse_Base {
   }
 
   // Detect Collision and Give a small feedback
-  detect_Collision(distances) {
+  detect_Collision(context, program_state, distances) {
+    var obj = null;
+    var counter = 0;
+
     const collide = distances.some((dist) => {
+      if (dist[0] < dist[2] && dist[1] < dist[3]) {
+        obj = counter;
+      }
+      counter += 1;
       return dist[0] < dist[2] && dist[1] < dist[3]
     });
+    
     if (collide) {
+
+      // Find object we collided with and set to true
+      if (obj in this.object_index) {
+          console.log(this.object_index[obj]);
+          this.object_found[this.object_index[obj]] = true;
+      }
+
       if (defs.left) {
         defs.thrust[0] = -0.3;
       } else if (defs.right) {
@@ -449,7 +484,9 @@ export class DarkHouse extends DarkHouse_Base {
         defs.thrust[2] = 0.3;
       }
       this.short_bounce = true;
-    } else if (this.short_bounce) {
+    } 
+    
+    else if (this.short_bounce) {
       defs.thrust[0] = 0;
       defs.thrust[2] = 0;
       this.short_bounce = false;
@@ -574,8 +611,17 @@ export class DarkHouse extends DarkHouse_Base {
   // Check game status : Determines if player has won or lost
   getGameState() {
     // If all objects have been found
-    if ((this.allObjectsFound) && (this.currentGameTime > 0)) {
+    if (this.currentGameTime > 0) {
+      for (var key in this.object_found) {
+        if (this.object_found.hasOwnProperty(key)) {
+            if (this.object_found[key] == false) {
+              this.victory = false;
+              return;
+            }
+        }
+      }
       this.victory = true;
+      this.endGame = true;
     }
     // All objects found but time has run out
     else if ((this.allObjectsFound) && (this.currentGameTime <= 0)) {
@@ -611,13 +657,18 @@ export class DarkHouse extends DarkHouse_Base {
     let cube_side = model_transform.times(Mat4.translation(-3, 0.5, 5.5))
         .times(Mat4.rotation(Math.PI/2, 0, 0, -1))
         .times(Mat4.rotation(Math.PI/2, 1, 0, 0));
-
     // Draw text
     for (let line of multi_line_string.slice(0, 30)) {
       // Set the string using set_string
       this.shapes.text.set_string(line, context.context);
       // Draw but scale down to fit box size
-      this.shapes.text.draw(context, program_state, cube_side.times(Mat4.scale(.18, .18, .18)), this.materials.text_image);
+      // Create blinking effect
+      if (this.currentGameTime < 11 && Math.floor(this.currentGameTime) % 2 == 0) {
+          let text_color = color(1,0,0,1);
+          this.shapes.text.draw(context, program_state, cube_side.times(Mat4.scale(.18, .18, .18)), this.materials.text_image.override({color: text_color}));
+      } else {
+          this.shapes.text.draw(context, program_state, cube_side.times(Mat4.scale(.18, .18, .18)), this.materials.text_image);
+      }
     }
 
     var z_inc = 0;
@@ -627,8 +678,13 @@ export class DarkHouse extends DarkHouse_Base {
       let obj_strings = ['' + key];
       let text_color = color(1,0,0,1);
 
-      if (this.object_found[key] == true)
+      // Make sure objects list text remains white
+      if (key == 'Objects List') {
         text_color = color(1,1,1,1);
+      } 
+      // If object is found, set the text color to green
+      else if (this.object_found[key] == true)
+        text_color = color(0,1,0,1);
 
       const multi_line_string2 = obj_strings[0].split("\n");
 
