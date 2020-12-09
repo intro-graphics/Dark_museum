@@ -417,7 +417,7 @@ export class DarkHouse extends DarkHouse_Base {
       ];
     });
 
-    this.detect_Collision(context, program_state, this.distances, 1);
+    this.detect_Collision(this.distances, 1);
 
     this.shapes.object1.draw(context, program_state, sphere_model_transform, this.materials.texture_sphere);
     //this.shapes.object2.draw(context, program_state, sphere2_model_transform, this.materials.texture_minecraft);
@@ -452,7 +452,7 @@ export class DarkHouse extends DarkHouse_Base {
   }
 
   // Detect Collision and Give a small feedback
-  detect_Collision(context, program_state, distances) {
+  detect_Collision(distances) {
     var obj = null;
     var counter = 0;
 
@@ -468,8 +468,11 @@ export class DarkHouse extends DarkHouse_Base {
 
       // Find object we collided with and set to true
       if (obj in this.object_index) {
-          console.log(this.object_index[obj]);
-          this.object_found[this.object_index[obj]] = true;
+          if (!this.object_found[this.object_index[obj]]) {
+            const objectName = this.object_index[obj];
+            console.log(objectName);
+            this.object_found[objectName] = true;
+          }
       }
 
       if (defs.left) {
@@ -746,7 +749,7 @@ export class DarkHouse extends DarkHouse_Base {
           if (this.victory) {
             this.gameWonScreen(context, program_state, model_transform);
           }
-          // Otherwise the u-ser lost, so display lost screen
+          // Otherwise the user lost, so display lost screen
           else {
             this.gameLostScreen(context, program_state, model_transform);
           }
