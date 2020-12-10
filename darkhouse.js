@@ -689,19 +689,19 @@ export class DarkHouse extends DarkHouse_Base {
       let obj_strings = ['' + key];
       let text_color = color(1, 0, 0, 1);
 
-      let object_found =
-
-        // Make sure objects list text remains white
-        // if (key == 'Objects List') {
+      // Make sure objects list text remains white
+      if (key == 'Objects List') {
         text_color = color(1, 1, 1, 1);
-      // }
+      }
       // If object is found, set the text color to green
-      if (this.object_found[key] == true)
+      else if (this.object_found[key] == true)
         text_color = color(0, 1, 0, 1);
+      // Default everything else to white
+      else {
+        text_color = color(1, 1, 1, 1);
+      }
 
       const multi_line_string2 = obj_strings[0].split("\n");
-
-
 
       for (let line of multi_line_string2.slice(0, 30)) {
 
