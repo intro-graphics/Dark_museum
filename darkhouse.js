@@ -415,9 +415,10 @@ export class DarkHouse extends DarkHouse_Base {
     this.centers[8] = [...cube_model_transform.transposed()[3], 2, 2];
 
     this.distances = this.centers.map((pos) => {
+      const camera_position = this.get_eye_location(program_state);
       return [
-        Math.abs(defs.pos[0] - pos[1]),
-        Math.abs(defs.pos[2] - pos[0]),
+        Math.abs(camera_position[1] - pos[1]),
+        Math.abs(camera_position[0] - pos[0]),
         pos[4],
         pos[5]
       ];
