@@ -406,7 +406,7 @@ export class DarkHouse extends DarkHouse_Base {
     // Center position, x, y
     this.centers[0] = [...cow_model_transform.transposed()[3], 2, 4];
     this.centers[1] = [...pedestal_model_transform.transposed()[3], 3, 3];
-    this.centers[2] = [...statue_model_transform.transposed()[3], 3, 4];
+    this.centers[2] = [...statue_model_transform.transposed()[3], 4, 5];
     this.centers[3] = [...vase_model_transform.transposed()[3], 6, 6];
     this.centers[4] = [...bull_model_transform.transposed()[3], 6, 3];
     this.centers[5] = [...bench1_model_transform.transposed()[3], 1.5, 5];
@@ -608,8 +608,10 @@ export class DarkHouse extends DarkHouse_Base {
   gameWonScreen(context, program_state, model_transform) {
     this.baseScreenSetup(context, program_state, model_transform);
 
+    var timeTaken = 60 - this.currentGameTime;
+    timeTaken = timeTaken.toFixed(2);
     // Define text to be written
-    let strings = ['\t\t\t\tYou Won!\n\n\nYou took ' + this.currentGameTime.toFixed(2) + 's.'];
+    let strings = ['\t\t\t\tYou Won!\n\n\nYou took ' + timeTaken + 's.'];
     const multi_line_string = strings[0].split("\n");
     let cube_side = Mat4.rotation(0, 1, 0, 0)
       .times(Mat4.rotation(0, 0, 1, 0))
