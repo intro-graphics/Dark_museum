@@ -975,16 +975,8 @@ const Movement_Controls = defs.Movement_Controls =
 
             this.live_string(box => box.textContent = "Camera movement");
             this.new_line(); this.new_line();
-            this.key_triggered_button("Roll +z", [","], () => this.rollz = 1, undefined, () => this.rollz = 0);
-            this.key_triggered_button("Roll -z", ["."], () => this.rollz = -1, undefined, () => this.rollz = 0);
-            this.new_line();
-            this.key_triggered_button("Roll +y", ["n"], () => this.rolly = 1, undefined, () => this.rolly = 0);
-            this.key_triggered_button("Roll -y", ["m"], () => this.rolly = -1, undefined, () => this.rolly = 0);
-            this.new_line();
-            this.key_triggered_button("Roll +x", ["v"], () => this.rollx = 1, undefined, () => this.rollx = 0);
-            this.key_triggered_button("Roll -x", ["b"], () => this.rollx = -1, undefined, () => this.rollx = 0);
-            this.new_line();
-            this.key_triggered_button("(Un)freeze mouse look around", ["f"], () => this.look_around_locked ^= 1, "#8B8885");
+            this.key_triggered_button("View Left", ["m"], () => this.rolly = 1, undefined, () => this.rolly = 0);
+            this.key_triggered_button("View Right", ["n"], () => this.rolly = -1, undefined, () => this.rolly = 0);
             this.new_line();
         }
 
